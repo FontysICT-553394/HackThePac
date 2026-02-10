@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -15,6 +16,8 @@ public class MainMenu : MonoBehaviour
     
     public GameObject mainMenuPanel;       
     public GameObject characterSelectPanel;
+
+    public GameObject hacksPanel;
     
     public SpeedController speedMenu;
     public Pacman pacman;
@@ -86,21 +89,20 @@ public class MainMenu : MonoBehaviour
     {
         mainMenuPanel.SetActive(false);
         characterSelectPanel.SetActive(true);
-        PlayerManager.Session_Started = true;
-        foreach (PlayerControl control in PlayerManager.addedPlayers)
-        {
-            if (control != null)
-            {
-                if (control.playerId <= 0)
-                {
-                    addPlayerSelect(control);
-                }
-                else
-                {
-                    control.setChooseMenu(selectionPanels[control.playerId - 1]);
-                } 
-            }
-        }
+    }
+
+    public void openHacksMenu()
+    {
+        mainMenuPanel.SetActive(false);
+        hacksPanel.SetActive(true);
+    }
+
+    public void StartGameAsCharacter(string characterName)
+    {
+        GameSettings settings = GameSettings.Instance;
+        settings.playerCharacter = characterName;
+        
+        SceneManager.LoadSceneAsync("Classic");
     }
 
     //private IEnumerator BlockInputOneFrame()

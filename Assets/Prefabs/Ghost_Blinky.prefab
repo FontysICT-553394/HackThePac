@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 701417503878347229, guid: 1926f81151ce34f428817d46a65e31e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2195735974031789876, guid: 1926f81151ce34f428817d46a65e31e2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.87886
@@ -68,6 +72,10 @@ PrefabInstance:
       propertyPath: m_Color.g
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6062485218697736770, guid: 1926f81151ce34f428817d46a65e31e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6603129537403288595, guid: 1926f81151ce34f428817d46a65e31e2, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -87,6 +95,10 @@ PrefabInstance:
     - target: {fileID: 8468735280469498773, guid: 1926f81151ce34f428817d46a65e31e2, type: 3}
       propertyPath: m_Name
       value: Ghost_Blinky
+      objectReference: {fileID: 0}
+    - target: {fileID: 8648506298901843361, guid: 1926f81151ce34f428817d46a65e31e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9187369253243965660, guid: 1926f81151ce34f428817d46a65e31e2, type: 3}
       propertyPath: initialDirection.x
