@@ -3856,7 +3856,7 @@ GameObject:
   - component: {fileID: 1712545691}
   m_Layer: 9
   m_Name: Walls
-  m_TagString: Untagged
+  m_TagString: walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13646,6 +13646,7 @@ MonoBehaviour:
   ghostEatFreezeTime: 1
   introController: {fileID: 1541390105}
   globalChompAudio: {fileID: 2051211850}
+  gameOverTimer: 2
 --- !u!4 &2121822163
 Transform:
   m_ObjectHideFlags: 0

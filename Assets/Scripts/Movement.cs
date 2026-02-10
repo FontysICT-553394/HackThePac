@@ -12,6 +12,8 @@ public class Movement : MonoBehaviour
     public Vector2 nextDirection { get; private set; }
     public Vector3 startingPosition { get; private set; }
     
+    public bool noclipEnabled = false;
+    
     private void Awake()
     {
         this.rigidbody = GetComponent<Rigidbody2D>();
@@ -29,7 +31,6 @@ public class Movement : MonoBehaviour
     /// <returns></returns>
     public void ResetState()
     {
-        this.speedMultiplier = 1.0f;
         this.direction = this.initialDirection;
         this.nextDirection = Vector2.zero;
         this.transform.position = this.startingPosition;
@@ -84,6 +85,8 @@ public class Movement : MonoBehaviour
     /// <returns></returns>
     public bool Occupied(Vector2 direction)
     {
+        if (noclipEnabled) return false;
+        
         RaycastHit2D hit = Physics2D.BoxCast(this.transform.position, Vector2.one * 0.75f, 0f, direction, 1.5f, this.obstacleLayer);
         return hit.collider != null;
     }

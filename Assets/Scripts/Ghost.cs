@@ -34,6 +34,8 @@ public class Ghost : MonoBehaviour
         this.frightened = GetComponent<GhostFrightened>();
     }
 
+    
+    
     /// <summary>
     /// Resets the Ghost's actions, states, puts them in the Home (center of the maze) and sets the Ghost active
     /// </summary>

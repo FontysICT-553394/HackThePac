@@ -30,7 +30,7 @@ public class PlayerControl : MonoBehaviour
     public SpriteRenderer[] playerNumbers;
     public GameObject indicator;
     public SpriteRenderer arrow;
-    public SpriteRenderer selectedNumber;
+    // public SpriteRenderer selectedNumber;
 
     private Vector3 offset = new Vector3(0, 1.5f, 1);
 
@@ -56,38 +56,54 @@ public class PlayerControl : MonoBehaviour
     /// <returns></returns>
     public void enableSelectedNumber()
     {
-        this.selectedNumber = playerNumbers[playerId - 1];
-        this.selectedNumber.gameObject.SetActive(true);
+        // this.selectedNumber = playerNumbers[playerId - 1];
+        // this.selectedNumber.gameObject.SetActive(true);
     }
 
     private void Update()
     {
         if(this.GameManager != null) //Running a per-frame check to see where the joystick on the controller is pointing to
         {
-            if (this.moveInput != Vector2.zero)
+            Vector2 keyboardInput = Vector2.zero;
+            
+            // Check for keyboard input (WASD and Arrow keys)
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+                keyboardInput.y = 1f;
+            else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+                keyboardInput.y = -1f;
+            
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+                keyboardInput.x = 1f;
+            else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+                keyboardInput.x = -1f;
+            
+            // Use keyboard input if available, otherwise use joystick input
+            Vector2 input = keyboardInput.sqrMagnitude > 0.01f ? keyboardInput : this.moveInput;
+            
+            if (input != Vector2.zero)
             {
-                if (this.moveInput.sqrMagnitude < 0.01f) return;
+                if (input.sqrMagnitude < 0.01f) return;
                 // --- IN-GAME MOVEMENT (No menu sound here) ---
-
+    
                 Vector2 direction = Vector2.zero;
-
-                if (this.moveInput.y > 0.5) // Joystick moving up
+    
+                if (input.y > 0.5) // Moving up
                 {
                     direction = Vector2.up;
                 }
-                else if (this.moveInput.y < -0.5) // Joystick moving down
+                else if (input.y < -0.5) // Moving down
                 {
                     direction = Vector2.down;
                 }
-                else if (this.moveInput.x > 0.5) // Joystick moving right
+                else if (input.x > 0.5) // Moving right
                 {
                     direction = Vector2.right;
                 }
-                else if (this.moveInput.x < -0.5) // Joystick moving left
+                else if (input.x < -0.5) // Moving left
                 {
                     direction = Vector2.left;
                 }
-
+    
                 if (team == PlayerTeam.Pacman && currentPacMan != null)
                 {
                     currentPacMan.movement.SetDirection(direction);
@@ -116,14 +132,14 @@ public class PlayerControl : MonoBehaviour
                 this.indicator.gameObject.SetActive(true);
                 Vector2 newPosition = this.currentPacMan.transform.position + offset;
                 this.indicator.transform.position = newPosition;
-                this.arrow.color = this.selectedNumber.color;
+                // this.arrow.color = this.selectedNumber.color;
             }
             if (currentGhost != null)
             {
                 this.indicator.gameObject.SetActive(true);
                 Vector2 newPosition = this.currentGhost.transform.position + offset;
                 this.indicator.transform.position = newPosition;
-                this.arrow.color = this.selectedNumber.color;
+                // this.arrow.color = this.selectedNumber.color;
             }
         }
     }

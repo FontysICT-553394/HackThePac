@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
@@ -30,6 +31,8 @@ public class GameManager : MonoBehaviour
     public GameObject speedTextGameObject;
     public TextMeshProUGUI selectedSpeedText;
 
+    private PlayerControl singlePlayerControl;
+    
     Color ghostColor;
     Color pacColor;
 
@@ -69,47 +72,28 @@ public class GameManager : MonoBehaviour
 
     Coroutine returnTextRoutine;
 
-
     private void Start()
     {
-        this.spawnInterval = 5f / SpeedController.gameSpeed;
-        
-        Time.timeScale = SpeedController.gameSpeed;
+        spawnInterval = 5f;
+        Time.timeScale = 1f;
+    
         if (uiManager != null) {
             uiManager.UpdateHighScoreDisplay(highScore);
         }
-        
+
         pacColor = this.pacmen[0].bodyRenderer.color;
         ghostColor = this.ghosts[0].bodyRenderer.color;
         humanPacmen = 0;
         humanGhosts = 0;
-        if (PlayerManager.addedPlayers != null) //Goes through each player and there selected team to add to the game
+        
+        AssignPlayerToChosenCharacter();
+        selectedSpeedText.text = GameSettings.Instance.PacmanSpeed switch
         {
-            for (int i = 0; i < PlayerManager.addedPlayers.Length; i++)
-            {
-                if (PlayerManager.addedPlayers[i] != null)
-                {
-                    if (PlayerManager.addedPlayers[i].hasSelected)
-                    {
-                        PlayerManager.addedPlayers[i].GameManager = this;
-                        SetPlayer(i);
-                    }
-                }
-            }
-        }
-
-        switch (SpeedController.gameSpeed) //Updates the text on screen to show the currently selected speed
-        {
-            case 1f:
-                this.selectedSpeedText.text = "NORMAL";
-                break;
-            case 1.5f:
-                this.selectedSpeedText.text = "FAST";
-                break;
-            case 2f:
-                this.selectedSpeedText.text = "TURBO";
-                break;
-        }
+            1f => "NORMAL",
+            2f => "FAST",
+            3f => "TURBO",
+            _ => selectedSpeedText.text
+        };
 
         //Spawns or sets entities (Ghost/Pac-Man) based off of the selected amount of extra entities. It also sets up routines for spawning Pac-Men and Ghosts if necessary
         aiPacmenCount = SliderController.PacmanAIAmount;
@@ -133,7 +117,10 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"humanPacmen={humanPacmen}, aiPacmenCount={aiPacmenCount}");
         Debug.Log($"humanGhosts={humanGhosts}, aiGhostCount={aiGhostCount}");
-        
+
+        //add the hacks
+        ApplyEntitySpeeds();
+        SetNoclip(GameSettings.Instance.PacmanNoClip);
         NewGame();
     }
 
@@ -659,6 +646,8 @@ public class GameManager : MonoBehaviour
             this.ghosts[i].isOutside = true;
         }
         this.ghosts[0].isOutside = true;
+        
+        ApplyEntitySpeeds();
     }
 
     /// <summary>
@@ -667,27 +656,19 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     private void GameOver()
     {
-        // 1. Safety check for PlayerManager and the static array
-        if (PlayerManager.addedPlayers != null)
+        // Clean up single-player control
+        if (singlePlayerControl != null)
         {
-            for (int i = 0; i < PlayerManager.addedPlayers.Length; i++)
+            singlePlayerControl.currentGhost = null;
+            singlePlayerControl.currentPacMan = null;
+        
+            if (singlePlayerControl.indicator != null)
             {
-                var player = PlayerManager.addedPlayers[i];
-                if (player != null)
-                {
-                    player.currentGhost = null;
-                    player.currentPacMan = null;
-                
-                    // Only disable indicator if it's actually assigned in Inspector
-                    if (player.indicator != null)
-                    {
-                        player.indicator.SetActive(false);
-                    }
-                }
+                singlePlayerControl.indicator.SetActive(false);
             }
         }
 
-        // 2. Disable ghosts safely
+        // Disable ghosts safely
         if (ghosts != null)
         {
             for (int i = 0; i < this.ghosts.Length; i++)
@@ -697,7 +678,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 3. Disable Pac-Men safely
+        // Disable Pac-Men safely
         if (this.pacmen != null && this.pacmen.Length > 0)
         {
             for (int i = 0; i < this.pacmen.Length; i++)
@@ -706,18 +687,18 @@ public class GameManager : MonoBehaviour
                     this.pacmen[i].gameObject.SetActive(false);
             }
         }
-        else if (this.pacman != null) // Fallback for single pacman variable
+        else if (this.pacman != null)
         {
             this.pacman.gameObject.SetActive(false);
         }
 
-        // 4. UI Visuals safety checks
+        // UI Visuals
         if (winTextGameObject != null) winTextGameObject.SetActive(true);
         if (overlayFade != null) overlayFade.gameObject.SetActive(true);
         if (speedTextGameObject != null) speedTextGameObject.SetActive(false);
         if (sirenAudio != null) sirenAudio.Stop();
         StopGlobalChomp();
-    
+
         frightenedGhostCount = 0;
         returnText.enabled = false;
         returnTextRoutine = StartCoroutine(showReturnTextCountdown());
@@ -1080,4 +1061,130 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    
+    /// <summary>
+    /// Applies the configured speeds from GameSettings to all Pac-Men and Ghosts.
+    /// </summary>
+    private void ApplyEntitySpeeds()
+    {
+        float pacmanSpeed = GameSettings.Instance.PacmanSpeed;
+        float ghostSpeed = GameSettings.Instance.GhostSpeed;
+    
+        // Apply speed to all Pac-Men
+        for (int i = 0; i < pacmen.Length; i++)
+        {
+            if (pacmen[i] != null && pacmen[i].movement != null)
+            {
+                pacmen[i].movement.speedMultiplier = pacmanSpeed;
+            }
+        }
+    
+        // Apply speed to all Ghosts
+        for (int i = 0; i < ghosts.Length; i++)
+        {
+            if (ghosts[i] != null && ghosts[i].movement != null)
+            {
+                ghosts[i].movement.speedMultiplier = ghostSpeed;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Assigns the player to their chosen character based on GameSettings.
+    /// </summary>
+    private void AssignPlayerToChosenCharacter()
+    {
+        string choice = GameSettings.Instance.playerCharacter;
+        Debug.Log($"[AssignPlayer] Character choice: '{choice}'");
+
+        if (string.IsNullOrEmpty(choice) || choice == "None")
+        {
+            Debug.Log("[AssignPlayer] No character chosen");
+            return;
+        }
+
+        // Create PlayerControl for single-player mode
+        GameObject playerObj = Instantiate(PlayerPrefab);
+        singlePlayerControl = playerObj.GetComponent<PlayerControl>();
+
+        if (singlePlayerControl == null)
+        {
+            Debug.LogError("[AssignPlayer] PlayerPrefab missing PlayerControl component!");
+            return;
+        }
+
+        singlePlayerControl.GameManager = this;
+
+        if (choice == "Pac")
+        {
+            if (pacmen.Length > 0 && pacmen[0] != null)
+            {
+                pacmen[0].controlledBy = singlePlayerControl;
+                singlePlayerControl.currentPacMan = pacmen[0];
+                singlePlayerControl.currentGhost = null;
+                singlePlayerControl.team = PlayerTeam.Pacman;
+                humanPacmen = 1;
+                Debug.Log($"[AssignPlayer] Assigned to Pac-Man");
+            }
+        }
+        else
+        {
+            int ghostIndex = GetGhostIndexByType(choice);
+            Debug.Log($"[AssignPlayer] Ghost index for '{choice}': {ghostIndex}");
+
+            if (ghostIndex >= 0 && ghostIndex < ghosts.Length && ghosts[ghostIndex] != null)
+            {
+                Ghost ghost = ghosts[ghostIndex];
+
+                ghost.controlledBy = singlePlayerControl;
+                singlePlayerControl.currentGhost = ghost;
+                singlePlayerControl.currentPacMan = null;
+                singlePlayerControl.team = PlayerTeam.Ghost;
+
+                ghost.home.duration = 0;
+                ghost.isOutside = true;
+
+                humanGhosts = 1;
+                ghostColor = ghost.bodyRenderer.color;
+                Debug.Log($"[AssignPlayer] Assigned to {choice}");
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Returns the ghost array index for a given character type.
+    /// </summary>
+    private int GetGhostIndexByType(string type)
+    {
+        return type switch
+        {
+            "Blinky" => 0,
+            "Pinky" => 1,
+            "Inky" => 2,
+            "Clyde" => 3,
+            _ => -1
+        };
+    }
+    
+    private void SetNoclip(bool enabled)
+    {
+        if (singlePlayerControl != null)
+        {
+            if (singlePlayerControl.currentPacMan != null && singlePlayerControl.currentPacMan.movement != null)
+            {
+                singlePlayerControl.currentPacMan.movement.noclipEnabled = enabled;
+            }
+            else if (singlePlayerControl.currentGhost != null && singlePlayerControl.currentGhost.movement != null)
+            {
+                singlePlayerControl.currentGhost.movement.noclipEnabled = enabled;
+            }
+        }
+
+        TilemapCollider2D walls = GameObject.FindGameObjectWithTag("walls")
+            .GetComponent<TilemapCollider2D>();
+
+        walls.enabled = false;
+    }
+    
+    
 }
