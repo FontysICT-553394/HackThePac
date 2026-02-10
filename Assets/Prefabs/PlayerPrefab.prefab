@@ -1,0 +1,273 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7229141511660233484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6717158566118649337}
+  - component: {fileID: 385505376541250876}
+  - component: {fileID: 8458284288592520650}
+  m_Layer: 5
+  m_Name: PlayerPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6717158566118649337
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7229141511660233484}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2724329137441169274}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &385505376541250876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7229141511660233484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8458284288592520650}
+        m_TargetAssemblyTypeName: PlayerControl, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+    m_ActionId: 351f2ccd-1f9f-44bf-9bec-d62ac5c5f408
+    m_ActionName: 'Player/Move[/ Retro Games LTD  Atari CX Wireless Controller/stick/up,/
+      Retro Games LTD  Atari CX Wireless Controller1/stick/up,/ Retro Games LTD 
+      Atari CX Wireless Controller/stick/down,/ Retro Games LTD  Atari CX Wireless
+      Controller1/stick/down,/ Retro Games LTD  Atari CX Wireless Controller/stick/left,/
+      Retro Games LTD  Atari CX Wireless Controller1/stick/left,/ Retro Games LTD 
+      Atari CX Wireless Controller/stick/right,/ Retro Games LTD  Atari CX Wireless
+      Controller1/stick/right]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8458284288592520650}
+        m_TargetAssemblyTypeName: PlayerControl, Assembly-CSharp
+        m_MethodName: OnInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+    m_ActionId: 852140f2-7766-474d-8707-702459ba45f3
+    m_ActionName: 'Player/Interact[/ Retro Games LTD  Atari CX Wireless Controller/trigger,/
+      Retro Games LTD  Atari CX Wireless Controller1/trigger]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c95b2375-e6d9-4b88-9c4c-c5e76515df4b
+    m_ActionName: 'UI/Navigate[/ Retro Games LTD  Atari CX Wireless Controller/stick/up,/
+      Retro Games LTD  Atari CX Wireless Controller1/stick/up,/ Retro Games LTD 
+      Atari CX Wireless Controller/stick/down,/ Retro Games LTD  Atari CX Wireless
+      Controller1/stick/down,/ Retro Games LTD  Atari CX Wireless Controller/stick/left,/
+      Retro Games LTD  Atari CX Wireless Controller1/stick/left,/ Retro Games LTD 
+      Atari CX Wireless Controller/stick/right,/ Retro Games LTD  Atari CX Wireless
+      Controller1/stick/right]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 7607c7b6-cd76-4816-beef-bd0341cfe950
+    m_ActionName: UI/Submit
+  m_NeverAutoSwitchControlSchemes: 1
+  m_DefaultControlScheme: Joystick
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &8458284288592520650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7229141511660233484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7a9255921632764c92dd018fe37bf7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerControl
+  GameManager: {fileID: 0}
+  team: 0
+  currentPacMan: {fileID: 0}
+  currentGhost: {fileID: 0}
+  playerInput: {fileID: 0}
+  playerNumbers:
+  - {fileID: 3122305702657316293}
+  - {fileID: 2931397630556642771}
+  - {fileID: 650618831272373630}
+  - {fileID: 7382596395131755931}
+  - {fileID: 1765819864113901985}
+  - {fileID: 4598427722631396087}
+  - {fileID: 6006840341506583407}
+  - {fileID: 4304652014505446712}
+  - {fileID: 1631589593134876121}
+  indicator: {fileID: 869684228146512765}
+  arrow: {fileID: 8170872373005190504}
+  selectedNumber: {fileID: 0}
+  speedMenu: {fileID: 0}
+  chooseMenu: {fileID: 0}
+  mainMenu: {fileID: 0}
+  pacSlider: {fileID: 0}
+  ghostSlider: {fileID: 0}
+  controllerId: 0
+  playerId: 0
+--- !u!1001 &2225014309256099235
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6717158566118649337}
+    m_Modifications:
+    - target: {fileID: 1364990408394815198, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_Name
+      value: Indicator
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+--- !u!212 &650618831272373630 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 1722522234237851869, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &869684228146512765 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1364990408394815198, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &1631589593134876121 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 595676568682606714, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &1765819864113901985 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 459830564443685890, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2724329137441169274 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4264368245411392217, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &2931397630556642771 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3913271992855226480, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &3122305702657316293 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3869857375872491622, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &4304652014505446712 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 2692559437840431259, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &4598427722631396087 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 2391467613451341652, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &6006840341506583407 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 5601426591984033484, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &7382596395131755931 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 8688735569791330360, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &8170872373005190504 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 8035569178982871243, guid: e3f9a684b27434843aa80cabcd0d9bb8, type: 3}
+  m_PrefabInstance: {fileID: 2225014309256099235}
+  m_PrefabAsset: {fileID: 0}
