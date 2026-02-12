@@ -10,6 +10,7 @@ public class GameSettings : MonoBehaviour
     public int ghostAmount = 4;
     public int powerPelletAmount = 4;
     public bool noClipEnabled = false;
+    public string selectedCharacter;
 
     private void Awake()
     {

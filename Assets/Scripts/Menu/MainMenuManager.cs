@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject mainMenu;
+    [SerializeField] private GameObject mainMenu;
+    [SerializeField] private GameObject characterSelectionMenu;
     
     [Header("Hacks")]
     [SerializeField] private GameObject hacksMenu;
@@ -15,21 +16,31 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private Slider powerPelletAmountSlider;
     [SerializeField] private Toggle noClipToggle;
     
-    public void PlayGame()
+    public void PlayGame(string character)
     {
-        return;
+        GameSettings.instance.selectedCharacter = character;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+    
+    public void ShowCharacterSelection() 
+    {
+        characterSelectionMenu.SetActive(true);
+        hacksMenu.SetActive(false);
+        mainMenu.SetActive(false);
     }
     
     public void ShowMainMenu()
     {
         mainMenu.SetActive(true);
         hacksMenu.SetActive(false);
+        characterSelectionMenu.SetActive(false);
     }
 
     public void ShowHacksMenu()
     {
         hacksMenu.SetActive(true);
         mainMenu.SetActive(false);
+        characterSelectionMenu.SetActive(false);
         SetSliders();
     }
 
