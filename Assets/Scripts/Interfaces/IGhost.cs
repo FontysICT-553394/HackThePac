@@ -3,6 +3,8 @@ using UnityEngine;
 public interface IGhost
 {
     GhostState CurrentState { get; }
+    Transform pacmanTransform { get; }
+    Transform homeTransform { get; }
     
     void Move();
     void SetTarget(Vector3 target);
