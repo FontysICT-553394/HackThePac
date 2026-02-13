@@ -4,17 +4,21 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private LayerMask wallLayer;
+    [SerializeField] public LayerMask wallLayer;
     [SerializeField] private float raycastDistance = 0.25f;
     [SerializeField] private Vector2 boxCastSize = Vector2.one * 0.75f;
+    
 
-    private Vector2 currentDirection = Vector2.zero;
-    private Vector2 queuedDirection = Vector2.zero;
-    private Rigidbody2D rb;
+    private Vector2 _currentDirection = Vector2.zero;
+    private Vector2 _queuedDirection = Vector2.zero;
+    private Rigidbody2D _rb;
+    private bool _isPacman = false;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
+        if(GameSettings.instance.selectedCharacter == "pacman")
+            _isPacman = true;
     }
 
     private void Update()
@@ -31,32 +35,32 @@ public class PlayerMovement : MonoBehaviour
     private void HandleInput()
     {
         if (Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
-            queuedDirection = Vector2.up;
+            _queuedDirection = Vector2.up;
         else if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
-            queuedDirection = Vector2.down;
+            _queuedDirection = Vector2.down;
         else if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame)
-            queuedDirection = Vector2.left;
+            _queuedDirection = Vector2.left;
         else if (Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame)
-            queuedDirection = Vector2.right;
+            _queuedDirection = Vector2.right;
     }
 
     private void TryQueuedDirection()
     {
-        if (queuedDirection != Vector2.zero && CanMove(queuedDirection))
+        if (_queuedDirection != Vector2.zero && CanMove(_queuedDirection))
         {
-            currentDirection = queuedDirection;
-            queuedDirection = Vector2.zero;
+            _currentDirection = _queuedDirection;
+            _queuedDirection = Vector2.zero;
         }
     }
 
     private void Move()
     {
-        if (currentDirection != Vector2.zero && CanMove(currentDirection))
+        if (_currentDirection != Vector2.zero && CanMove(_currentDirection))
         {
-            RotateToDirection(currentDirection);
+            RotateToDirection(_currentDirection);
             
             float finalSpeed = moveSpeed;
-            if (GameSettings.instance.selectedCharacter.Equals("pacman"))
+            if (_isPacman)
             {
                 finalSpeed += GameSettings.instance.pacmanSpeed;
             }
@@ -65,8 +69,8 @@ public class PlayerMovement : MonoBehaviour
                 finalSpeed += GameSettings.instance.ghostSpeed;
             }
             
-            Vector2 translation = finalSpeed * Time.fixedDeltaTime * currentDirection;
-            rb.MovePosition(rb.position + translation);
+            Vector2 translation = finalSpeed * Time.fixedDeltaTime * _currentDirection;
+            _rb.MovePosition(_rb.position + translation);
         }
     }
 
@@ -85,8 +89,8 @@ public class PlayerMovement : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, currentDirection * raycastDistance);
+        Gizmos.DrawRay(transform.position, _currentDirection * raycastDistance);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, queuedDirection * raycastDistance);
+        Gizmos.DrawRay(transform.position, _queuedDirection * raycastDistance);
     }
 }
