@@ -12,9 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
   m_Name: glitch corner
   m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.Tilemaps.AnimatedTile
-  m_AnimatedSprites: []
-  m_MinSpeed: 1
-  m_MaxSpeed: 1
+  m_AnimatedSprites:
+  - {fileID: -900460907, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 2053412406, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: -1664731718, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: -645298589, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 887090799, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: -1471312889, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 1801444895, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 1554898888, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 956715425, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 1045598690, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 393678057, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 2040400693, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 305617495, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  - {fileID: 547219370, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
+  m_MinSpeed: 60
+  m_MaxSpeed: 60
   m_AnimationStartTime: 0
   m_AnimationStartFrame: 0
   m_TileColliderType: 0
