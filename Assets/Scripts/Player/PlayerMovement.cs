@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] public LayerMask wallLayer;
-    [SerializeField] private float raycastDistance = 0.25f;
+    [SerializeField] private float raycastDistance = 0.225f;
     [SerializeField] private Vector2 boxCastSize = Vector2.one * 0.75f;
     
 
