@@ -4,6 +4,8 @@ using UnityEngine.Tilemaps;
 
 public class PacMan : MonoBehaviour
 {
+    public bool isPoweredUp = false;
+    
     private GameManager _gameManager;
     private GameObject _pelletTilemap;
     private GameObject _powerPelletTilemap;
@@ -11,14 +13,20 @@ public class PacMan : MonoBehaviour
     private BoxCollider2D _pacmanCollider2D;
     private TilemapCollider2D _powerPelletTilemapCollider2D;
     private TilemapCollider2D _pelletTilemapCollider2D;
-    
+
+    private Tilemap _pelletTilemapComponent;
+    private Tilemap _powerPelletTilemapComponent;
     private List<BoxCollider2D> ghostColliders = new List<BoxCollider2D>();
+
+    private bool _isDead = false;
     
     private void Start()
     {
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _pelletTilemap = GameObject.Find("pelletsTilemap");
         _powerPelletTilemap = GameObject.Find("powerpelletsTilemap");
+        _pelletTilemapComponent = _pelletTilemap.GetComponent<Tilemap>();
+        _powerPelletTilemapComponent = _powerPelletTilemap.GetComponent<Tilemap>();
         
         _gameManager = FindObjectOfType<GameManager>();
         _pacmanCollider2D = gameObject.GetComponent<BoxCollider2D>();
@@ -40,33 +48,34 @@ public class PacMan : MonoBehaviour
         if (_powerPelletTilemapCollider2D.IsTouching(_pacmanCollider2D))
             EatPowerPellet();
 
-        foreach (var ghostCollider in ghostColliders)
+        if (!isPoweredUp)
         {
-            if (_pacmanCollider2D.IsTouching(ghostCollider))
-                OnCollisionWithGhost();
+            foreach (var ghostCollider in ghostColliders)
+            {
+                if (_pacmanCollider2D.IsTouching(ghostCollider) && !_isDead)
+                    OnCollisionWithGhost();
+            }
         }
     }
     
     private void EatPellet()
     {
-        var pelletTilemapComponent = _pelletTilemap.GetComponent<Tilemap>();
-        var cellPos = pelletTilemapComponent.WorldToCell(gameObject.transform.position);
+        var cellPos = _pelletTilemapComponent.WorldToCell(gameObject.transform.position);
 
-        if (pelletTilemapComponent.HasTile(cellPos))
+        if (_pelletTilemapComponent.HasTile(cellPos))
         {
-            _gameManager.PelletEaten(pelletTilemapComponent, cellPos);
+            _gameManager.PelletEaten(_pelletTilemapComponent, cellPos);
             _gameManager.AddScore(10f);
         }
     }
     
     private void EatPowerPellet()
     {
-        var powerTilemapComponent = _powerPelletTilemap.GetComponent<Tilemap>();
-        var cellPos = powerTilemapComponent.WorldToCell(gameObject.transform.position);
+        var cellPos = _powerPelletTilemapComponent.WorldToCell(gameObject.transform.position);
         
-        if (powerTilemapComponent.HasTile(cellPos))
+        if (_powerPelletTilemapComponent.HasTile(cellPos))
         {
-            _gameManager.PelletEaten(powerTilemapComponent, cellPos, true);
+            _gameManager.PelletEaten(_powerPelletTilemapComponent, cellPos, true);
             _gameManager.AddScore(50f);
         }
         
@@ -74,7 +83,7 @@ public class PacMan : MonoBehaviour
 
     private void OnCollisionWithGhost()
     {
-        Debug.Log("Ghost collision");
+        _isDead = true;
         _gameManager.PacManDied();
     }
 }

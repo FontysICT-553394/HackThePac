@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 using UnityEngine.Tilemaps;
 
@@ -18,12 +19,20 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     [SerializeField] private GameObject pelletTilemap;
     [SerializeField] private GameObject powerPelletTilemap;
+    
+    [Header("Game UI")]
     [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text highScoreTextLose;
+    [SerializeField] private TMP_Text highScoreTextWin;
+    [SerializeField] private GameObject gameWinUI;
+    [SerializeField] private GameObject gameLoseUI;
     
     private float _score = 0f;
     
     private GameObject _pacmanInstance;
     private List<GameObject> _ghostInstances = new List<GameObject>();
+    private Tilemap _pelletMap;
+    private Tilemap _powerPelletMap;
     private TilemapCollider2D _powerPelletTilemapCollider2D;
     private TilemapCollider2D _pelletTilemapCollider2D;
     
@@ -34,12 +43,31 @@ public class GameManager : MonoBehaviour
     {
         _pelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
         _powerPelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
+        _pelletMap = pelletTilemap.GetComponent<Tilemap>();
+        _powerPelletMap = powerPelletTilemap.GetComponent<Tilemap>();
         
         InstantiatePacman();
         InstantiateGhosts();
         
         AddPlayerScriptToPlayer();
         AddAiScriptToEnemies();
+    }
+    
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void Update()
+    {
+        int pelletsLeft = CountTiles(_pelletMap) + CountTiles(_powerPelletMap);
+        if (pelletsLeft <= 0)
+            AllPelletsEaten();
     }
     
     private void InstantiatePacman()
@@ -113,28 +141,38 @@ public class GameManager : MonoBehaviour
 
     public void PacManDied()
     {
-        //TODO: Show game-over screen (if you won or not), reset to main menu, etc.
         if (GameSettings.instance.selectedCharacter == "pacman")
-        {
-            //You Lost
-        }
+            ShowLose();
         else
-        {
-            //You won
-        }
+            ShowWin();
     }
 
     private void AllPelletsEaten()
     {
-        //TODO: Show game-over screen (if you won or not), reset to main menu, etc.
         if (GameSettings.instance.selectedCharacter == "pacman")
-        {
-            //You Won
-        }
+            ShowWin();
         else
-        {
-            //You Lost
-        }
+            ShowLose();
+    }
+
+    private void ShowWin()
+    {
+        gameWinUI.SetActive(true);
+        gameLoseUI.SetActive(false);
+        scoreText.enabled = false;
+        
+        highScoreTextWin.text = "Score: " + _score;
+        Time.timeScale = 0;
+    }
+
+    private void ShowLose()
+    {
+        gameWinUI.SetActive(false);
+        gameLoseUI.SetActive(true);
+        scoreText.enabled = false;
+        
+        highScoreTextLose.text = "Score: " + _score;
+        Time.timeScale = 0;
     }
     
     /// <summary>
@@ -152,4 +190,25 @@ public class GameManager : MonoBehaviour
         scoreText.text = "Score: " + _score;
     }
     
+    private int CountTiles(Tilemap tilemap)
+    {
+        if (tilemap == null) return 0;
+        var bounds = tilemap.cellBounds;
+        int count = 0;
+        for (int x = bounds.xMin; x < bounds.xMax; x++)
+        {
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
+            {
+                var pos = new Vector3Int(x, y, 0);
+                if (tilemap.HasTile(pos))
+                    count++;
+            }
+        }
+        return count;
+    }
+    
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Time.timeScale = 1f;
+    }
 }
