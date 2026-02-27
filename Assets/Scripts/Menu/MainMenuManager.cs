@@ -19,8 +19,8 @@ public class MainMenuManager : MonoBehaviour
     public void PlayGame(string character)
     {
         GameSettings.instance.selectedCharacter = character;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        // SceneManager.LoadScene("Game - Beau");
+        // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene("Game - Beau");
     }
     
     public void ShowCharacterSelection() 

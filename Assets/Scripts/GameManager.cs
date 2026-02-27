@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     public void Start()
     {
         _pelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
-        _powerPelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
+        _powerPelletTilemapCollider2D = powerPelletTilemap.GetComponent<TilemapCollider2D>();
         _pelletMap = pelletTilemap.GetComponent<Tilemap>();
         _powerPelletMap = powerPelletTilemap.GetComponent<Tilemap>();
         
@@ -108,7 +108,8 @@ public class GameManager : MonoBehaviour
     {
         if (GameSettings.instance.selectedCharacter != "pacman")
         {
-            //TODO: Add pacman ai script
+            if (_pacmanInstance.GetComponent<PacManAI>() == null) 
+                _pacmanInstance.AddComponent<PacManAI>();
         }
         
         foreach (var ghost in _ghostInstances)
