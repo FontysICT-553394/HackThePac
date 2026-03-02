@@ -8,7 +8,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float raycastDistance = 0.225f;
     [SerializeField] private Vector2 boxCastSize = Vector2.one * 0.75f;
     
-
     private Vector2 _currentDirection = Vector2.zero;
     private Vector2 _queuedDirection = Vector2.zero;
     private Rigidbody2D _rb;
@@ -19,6 +18,11 @@ public class PlayerMovement : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         if(GameSettings.instance.selectedCharacter == "pacman")
             _isPacman = true;
+    }
+
+    private void Start()
+    {
+        wallLayer = LayerMask.GetMask("Walls");
     }
 
     private void Update()
@@ -57,8 +61,6 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_currentDirection != Vector2.zero && CanMove(_currentDirection))
         {
-            RotateToDirection(_currentDirection);
-            
             float finalSpeed = moveSpeed;
             if (_isPacman)
             {
@@ -72,12 +74,6 @@ public class PlayerMovement : MonoBehaviour
             Vector2 translation = finalSpeed * Time.fixedDeltaTime * _currentDirection;
             _rb.MovePosition(_rb.position + translation);
         }
-    }
-
-    private void RotateToDirection(Vector2 direction)
-    {
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     private bool CanMove(Vector2 direction)

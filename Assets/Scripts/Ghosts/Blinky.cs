@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Blinky : MonoBehaviour, IGhost
+public class Blinky : MonoBehaviour
 {
     public GhostState CurrentState { get; }
     public Transform pacmanTransform { get; }
