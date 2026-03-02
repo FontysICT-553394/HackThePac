@@ -162,7 +162,12 @@ public class GameManager : MonoBehaviour
         gameLoseUI.SetActive(false);
         scoreText.enabled = false;
         
-        highScoreTextWin.text = "Score: " + _score;
+        if (GameSettings.instance.selectedCharacter == "pacman")
+            highScoreTextLose.text = "Score: " + _score;
+        else
+            highScoreTextLose.text = "Score: " + (2620 - _score);
+            
+        
         Time.timeScale = 0;
     }
 
@@ -171,8 +176,12 @@ public class GameManager : MonoBehaviour
         gameWinUI.SetActive(false);
         gameLoseUI.SetActive(true);
         scoreText.enabled = false;
+
+        if (GameSettings.instance.selectedCharacter == "pacman")
+            highScoreTextLose.text = "Score: " + _score;
+        else
+            highScoreTextLose.text = "Score: " + (2620 - _score);
         
-        highScoreTextLose.text = "Score: " + _score;
         Time.timeScale = 0;
     }
     
