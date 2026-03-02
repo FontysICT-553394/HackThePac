@@ -20,6 +20,11 @@ public class PlayerMovement : MonoBehaviour
             _isPacman = true;
     }
 
+    private void Start()
+    {
+        wallLayer = LayerMask.GetMask("Walls");
+    }
+
     private void Update()
     {
         HandleInput();
