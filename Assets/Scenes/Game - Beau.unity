@@ -2633,7 +2633,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Teleporter
   targetTeleportLocation: {fileID: 1796841328}
   teleportOffset: 8
-  teleportCooldown: 0.3
+  teleportCooldown: 0.4
 --- !u!61 &1369181973
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8208,7 +8208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Teleporter
   targetTeleportLocation: {fileID: 1369181971}
   teleportOffset: 8
-  teleportCooldown: 0.3
+  teleportCooldown: 0.4
 --- !u!61 &1796841330
 BoxCollider2D:
   m_ObjectHideFlags: 0
