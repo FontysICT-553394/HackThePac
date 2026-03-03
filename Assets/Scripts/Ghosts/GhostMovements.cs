@@ -1,34 +1,49 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class GhostMovement : MonoBehaviour
 {
-    public enum Mode { Scatter, Chase, Frightened, Eaten }
+    public enum Mode
+    {
+        Scatter,
+        Chase,
+        Frightened,
+        Eaten
+    }
 
-    [Header("House")]
-    [SerializeField] private Transform houseExitTarget; // empty object op de node NET buiten de deur
+    [Header("House")] 
+    [SerializeField] public Transform houseExitTarget;
     [SerializeField] private float exitSnapDistance = 0.05f;
 
+    [Header("House Bobbing")] 
+    [SerializeField] private float bobAmplitude = 0.35f;
+    [SerializeField] private float bobSpeed = 8f;
+
     public bool IsInHouse { get; private set; } = true;
+    public bool startsOutsideHouse = false;
     private bool leavingHouse;
+    private Vector3 houseHomePos;
 
-    [Header("Refs")]
-    [SerializeField] private NodeGraphBuilder graph;
-    [SerializeField] private Transform pacman;
+    [Header("Refs")] 
+    [SerializeField] public NodeGraphBuilder graph;
+    [SerializeField] public Transform pacman;
 
-    [Header("Movement")]
-    [SerializeField] private float speed = 4f;
+    [Header("Movement")] [SerializeField] private float speed = 4f;
+    [SerializeField] private float houseExitSpeed = 3f;
     [SerializeField] private Mode mode = Mode.Chase;
 
-    [Header("Scatter Target (wereldpos)")]
-    [SerializeField] private Vector2 scatterCornerWorld = new Vector2(12, 10);
+    [Header("Scatter Target (world pos)")] 
+    [SerializeField] public Vector2 scatterCornerWorld = new(12, 10);
 
     // node state
     private NodeData current;
     private NodeData previous;
     private NodeData next;
+    private NodeData firstNode;
+    private bool movingToFirstNode;
 
-    // Classic tie-break (arcade-ish): Up, Left, Down, Right
+    private float bobTimer;
+    
     private static readonly Vector2Int[] TieBreakOrder =
     {
         Vector2Int.up,
@@ -39,28 +54,56 @@ public class GhostMovement : MonoBehaviour
 
     private void Start()
     {
-        if (!graph) { Debug.LogError("GhostMovement: graph ontbreekt."); enabled = false; return; }
+        if (!graph)
+        {
+            Debug.LogError("GhostMovement: graph ontbreekt.");
+            enabled = false;
+            return;
+        }
 
-        // Alleen snap naar graph als je NIET in house start (of als je house nodes hebt)
-        current = graph.GetClosestNode(transform.position);
-
-        // Als je wél house nodes hebt, is dit goed:
-        transform.position = current.WorldPos;
-
-        previous = null;
-
-        // Als hij nog in house zit: laat hem binnen bewegen totdat hij released is
-        next = ChooseNextNode(current, previous);
+        if (startsOutsideHouse)
+        {
+            // Blinky: smoothly move to nearest node (no snap)
+            IsInHouse = false;
+            leavingHouse = true;          // reuse the leaving state so Update() calls HandleHouseExit()
+            movingToFirstNode = true;     // skip Phase 1 & 2, go straight to Phase 3
+            firstNode = graph.GetClosestNode(transform.position);
+        }
+        else
+        {
+            // Pinky/Inky/Clyde: stay in house, remember home position
+            IsInHouse = true;
+            leavingHouse = false;
+            houseHomePos = transform.position;
+            bobTimer = Random.Range(0f, Mathf.PI * 2f);
+            current = null;
+            previous = null;
+            next = null;
+        }
     }
 
     private void Update()
     {
+        if (IsInHouse && !leavingHouse)
+        {
+            // Bob up and down inside the house
+            bobTimer += Time.deltaTime * bobSpeed;
+            Vector3 bobOffset = new Vector3(0f, Mathf.Sin(bobTimer) * bobAmplitude, 0f);
+            transform.position = houseHomePos + bobOffset;
+            return;
+        }
+
+        if (leavingHouse)
+        {
+            HandleHouseExit();
+            return;
+        }
+
+        // Normal pathfinding movement
         if (current == null || next == null) return;
 
-        // move
         transform.position = Vector3.MoveTowards(transform.position, next.WorldPos, speed * Time.deltaTime);
 
-        // arrived at next node
         if ((transform.position - next.WorldPos).sqrMagnitude < 0.0001f)
         {
             transform.position = next.WorldPos;
@@ -68,31 +111,62 @@ public class GhostMovement : MonoBehaviour
             current = next;
             next = ChooseNextNode(current, previous);
         }
+    }
+    
+    private void HandleHouseExit()
+    {
+        if (houseExitTarget == null) return;
 
-        // Als we leavingHouse zijn: check of we bij exit zijn
-        if (leavingHouse && houseExitTarget != null)
+        // Phase 3: Smoothly move to the first graph node (no snap)
+        if (movingToFirstNode)
         {
-            if ((transform.position - houseExitTarget.position).sqrMagnitude <= exitSnapDistance * exitSnapDistance)
+            transform.position = Vector3.MoveTowards(transform.position, firstNode.WorldPos, houseExitSpeed * Time.deltaTime);
+
+            if ((transform.position - firstNode.WorldPos).sqrMagnitude <= exitSnapDistance * exitSnapDistance)
             {
+                transform.position = firstNode.WorldPos;
                 leavingHouse = false;
-                // vanaf hier doet hij normaal scatter/chase keuzes
+                movingToFirstNode = false;
+                current = firstNode;
+                previous = null;
+                next = ChooseNextNode(current, previous);
             }
+            return;
+        }
+
+        // Phase 1: Align horizontally with exit
+        Vector3 centerAlign = new Vector3(houseExitTarget.position.x, transform.position.y, transform.position.z);
+
+        if (Mathf.Abs(transform.position.x - houseExitTarget.position.x) > exitSnapDistance)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, centerAlign, houseExitSpeed * Time.deltaTime);
+            return;
+        }
+
+        // Phase 2: Move up toward the exit point
+        transform.position = Vector3.MoveTowards(transform.position, houseExitTarget.position, houseExitSpeed * Time.deltaTime);
+
+        if ((transform.position - houseExitTarget.position).sqrMagnitude <= exitSnapDistance * exitSnapDistance)
+        {
+            // Arrived at exit â€” start Phase 3: smoothly move to nearest node
+            transform.position = houseExitTarget.position;
+            firstNode = graph.GetClosestNode(transform.position);
+            movingToFirstNode = true;
         }
     }
+
 
     private NodeData ChooseNextNode(NodeData from, NodeData cameFrom)
     {
         var options = new List<NodeData>(from.Neighbors);
 
-        if (options.Count == 0) return cameFrom; // edge case
+        if (options.Count == 0) return cameFrom;
 
-        // verwijder reverse (niet omkeren), tenzij dead-end
         if (cameFrom != null && options.Count > 1)
         {
             options.Remove(cameFrom);
         }
 
-        // frightened = random (maar nog steeds niet reverse tenzij dead-end)
         if (mode == Mode.Frightened)
         {
             return options[Random.Range(0, options.Count)];
@@ -100,7 +174,6 @@ public class GhostMovement : MonoBehaviour
 
         Vector3 target = GetTargetWorld();
 
-        // kies optie met kleinste afstand naar target; bij gelijk: tie-break via richting (Up,Left,Down,Right)
         NodeData best = null;
         float bestDist = float.PositiveInfinity;
 
@@ -115,7 +188,6 @@ public class GhostMovement : MonoBehaviour
             }
             else if (Mathf.Abs(d - bestDist) < 0.00001f && best != null)
             {
-                // tie-break: kijk welke richting "eerder" komt in TieBreakOrder
                 var dirA = WorldDir(from.WorldPos, best.WorldPos);
                 var dirB = WorldDir(from.WorldPos, opt.WorldPos);
 
@@ -129,14 +201,10 @@ public class GhostMovement : MonoBehaviour
 
     private Vector3 GetTargetWorld()
     {
-        // Eerst naar de uitgang als we net released zijn
-        if (leavingHouse && houseExitTarget != null)
-            return houseExitTarget.position;
-
         switch (mode)
         {
             case Mode.Scatter:
-                return scatterCornerWorld;
+                return (Vector3)scatterCornerWorld;
             case Mode.Chase:
             default:
                 return pacman ? pacman.position : transform.position;
@@ -146,8 +214,6 @@ public class GhostMovement : MonoBehaviour
     private static Vector2Int WorldDir(Vector3 from, Vector3 to)
     {
         Vector2 delta = to - from;
-
-        // nodes liggen grid-aligned, dus delta is ongeveer (±n,0) of (0,±n)
         if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             return delta.x >= 0 ? Vector2Int.right : Vector2Int.left;
         else
@@ -156,28 +222,24 @@ public class GhostMovement : MonoBehaviour
 
     private static int CompareDirPriority(Vector2Int a, Vector2Int b)
     {
-        int pa = PriorityIndex(a);
-        int pb = PriorityIndex(b);
-        return pa.CompareTo(pb);
+        return PriorityIndex(a).CompareTo(PriorityIndex(b));
     }
 
     private static int PriorityIndex(Vector2Int d)
     {
         for (int i = 0; i < TieBreakOrder.Length; i++)
-            if (TieBreakOrder[i] == d) return i;
+            if (TieBreakOrder[i] == d)
+                return i;
         return 999;
     }
 
-    // Handig om later modes te switchen (en dan reverse te doen)
     public void SetMode(Mode newMode, bool reverseOnSwitch)
     {
         if (mode == newMode) return;
-
         mode = newMode;
 
-        if (reverseOnSwitch && previous != null)
+        if (reverseOnSwitch && previous != null && !IsInHouse && !leavingHouse)
         {
-            // direct omkeren: swap next/previous
             var temp = previous;
             previous = next;
             next = temp;

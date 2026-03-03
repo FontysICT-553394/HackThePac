@@ -36,10 +36,9 @@ public class PacMan : MonoBehaviour
         _powerPelletTilemapCollider2D = _powerPelletTilemap.GetComponent<TilemapCollider2D>();
         
         ghostColliders.Add(GameObject.Find("blinky(Clone)").TryGetComponent<BoxCollider2D>(out var blinkyCollider) ? blinkyCollider : null);
-        //TODO: Enable when ghost prefabs are fixed to have colliders
-        // ghostColliders.Add(GameObject.Find("pinky(Clone)").TryGetComponent<BoxCollider2D>(out var pinkyCollider) ? pinkyCollider : null);
-        // ghostColliders.Add(GameObject.Find("inky(Clone)").TryGetComponent<BoxCollider2D>(out var inkyCollider) ? inkyCollider : null);
-        // ghostColliders.Add(GameObject.Find("clyde(Clone)").TryGetComponent<BoxCollider2D>(out var clydeCollider) ? clydeCollider : null);
+        ghostColliders.Add(GameObject.Find("pinky(Clone)").TryGetComponent<BoxCollider2D>(out var pinkyCollider) ? pinkyCollider : null);
+        ghostColliders.Add(GameObject.Find("inky(Clone)").TryGetComponent<BoxCollider2D>(out var inkyCollider) ? inkyCollider : null);
+        ghostColliders.Add(GameObject.Find("clyde(Clone)").TryGetComponent<BoxCollider2D>(out var clydeCollider) ? clydeCollider : null);
     }
 
     private void Update()
@@ -97,7 +96,7 @@ public class PacMan : MonoBehaviour
 
     private void OnCollisionWithGhost()
     {
-        GhostHouseController.Instance.OnLifeLost();
+        // GhostHouseController.Instance.OnLifeLost();
         _isDead = true;
         _gameManager.PacManDied();
     }

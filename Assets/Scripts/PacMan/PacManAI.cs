@@ -14,7 +14,7 @@ public class PacManAI : MonoBehaviour
     [Header("AI Tuning")] 
     // How close a ghost must be (in units) before PacMan reacts to it.
     // Increase to make PacMan react to ghosts from further away; decrease to make it braver.
-    [SerializeField] private float ghostDangerRadius = 3f; 
+    [SerializeField] private float ghostDangerRadius = 6f; 
     
     // How strongly PacMan avoids (or chases when powered up) ghosts within danger radius.
     // Higher values = more aggressive avoidance/chasing; lower values = ghost proximity matters less.

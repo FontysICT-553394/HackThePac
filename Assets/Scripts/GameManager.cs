@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     [SerializeField] private GameObject pelletTilemap;
     [SerializeField] private GameObject powerPelletTilemap;
+    [SerializeField] private NodeGraphBuilder _nodeGraphBuilder;
+    [SerializeField] private Transform _houseExitTarget;
     
     [Header("Game UI")]
     [SerializeField] private TMP_Text scoreText;
@@ -26,6 +28,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text highScoreTextWin;
     [SerializeField] private GameObject gameWinUI;
     [SerializeField] private GameObject gameLoseUI;
+    
     
     private float _score = 0f;
     
@@ -84,41 +87,84 @@ public class GameManager : MonoBehaviour
         foreach (var ghost in _ghostInstances)
             Destroy(ghost);
         _ghostInstances.Clear();
-        
-        var j = 0;
-        for (int i = 0; i < 4; i++)
+
+        for (int i = 0; i < ghostPrefabs.Count; i++)
         {
-            var ghostInstance = Instantiate(ghostPrefabs[j], ghostSpawn[j].position, Quaternion.identity);
+            if (i >= ghostSpawn.Count)
+            {
+                Debug.LogError($"Not enough spawn points for ghost index {i}");
+                break;
+            }
+
+            var ghostInstance = Instantiate(ghostPrefabs[i], ghostSpawn[i].position, Quaternion.identity);
             _ghostInstances.Add(ghostInstance);
-            
-            j++;
-            if (j == 4)
-                j = 0;
         }
     }
+
+    private void AddAiScriptToEnemies()
+    {
+        if (GameSettings.instance.selectedCharacter != "pacman")
+        {
+            if (_pacmanInstance.GetComponent<PacManAI>() == null)
+                _pacmanInstance.AddComponent<PacManAI>();
+        }
+
+        if (_nodeGraphBuilder == null)
+            Debug.LogError("GameManager: _nodeGraphBuilder is not assigned in the Inspector!");
+        if (_houseExitTarget == null)
+            Debug.LogError("GameManager: _houseExitTarget is not assigned in the Inspector!");
+
+        foreach (var ghost in _ghostInstances)
+        {
+            if (ghost.name.Equals(GameSettings.instance.selectedCharacter + "(Clone)",
+                    StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            // Remove any pre-existing GhostMovement from the prefab
+            var existing = ghost.GetComponent<GhostMovement>();
+            if (existing != null)
+                Destroy(existing);
+
+            GhostMovement ai = ghost.AddComponent<GhostMovement>();
+            ai.graph = _nodeGraphBuilder;
+            ai.pacman = _pacmanInstance.transform;
+            ai.houseExitTarget = _houseExitTarget;
+
+            if (ghost.name.IndexOf("blinky", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                ai.startsOutsideHouse = true;
+                ai.scatterCornerWorld = new Vector2(12, 10);
+            }
+        }
+        
+        GhostMovement pinkyAi = null, inkyAi = null, clydeAi = null;
+
+        foreach (var ghost in _ghostInstances)
+        {
+            var ai = ghost.GetComponent<GhostMovement>();
+            if (ai == null) continue;
+
+            if (ghost.name.IndexOf("pinky", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                pinkyAi = ai;
+            else if (ghost.name.IndexOf("inky", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                inkyAi = ai;
+            else if (ghost.name.IndexOf("clyde", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                clydeAi = ai;
+        }
+
+        if (GhostHouseController.Instance != null)
+            GhostHouseController.Instance.RegisterGhosts(pinkyAi, inkyAi, clydeAi);
+        else
+            Debug.LogError("GhostHouseController.Instance is null — make sure it exists in the scene.");
+    }
+
+
 
     private void AddPlayerScriptToPlayer()
     {
         var playerCharacterName = GameSettings.instance.selectedCharacter;
         var character = GameObject.Find(playerCharacterName + "(Clone)");
         character.AddComponent<PlayerMovement>().wallLayer = LayerMask.GetMask("walls");
-    }
-    
-    private void AddAiScriptToEnemies()
-    {
-        if (GameSettings.instance.selectedCharacter != "pacman")
-        {
-            if (_pacmanInstance.GetComponent<PacManAI>() == null) 
-                _pacmanInstance.AddComponent<PacManAI>();
-        }
-        
-        foreach (var ghost in _ghostInstances)
-        {
-            if (ghost.name == GameSettings.instance.selectedCharacter + "(Clone)")
-                continue;
-            
-            //TODO: Add ghost AI
-        }
     }
     
     /// <summary>
@@ -132,6 +178,7 @@ public class GameManager : MonoBehaviour
         if (tilemap.HasTile(cellPos))
         {
             tilemap.SetTile(cellPos, null);
+            GhostHouseController.Instance.OnDotEaten();
         }
 
         if (isPowerPellet)
@@ -165,7 +212,14 @@ public class GameManager : MonoBehaviour
         if (GameSettings.instance.selectedCharacter == "pacman")
             highScoreTextLose.text = "Score: " + _score;
         else
-            highScoreTextLose.text = "Score: " + (2620 - _score);
+        {
+            // Debug the exact string before assigning
+            var s = GameSettings.instance.selectedCharacter == "pacman"
+                ? "Score: " + _score
+                : "Score: " + (2620f - _score);
+            Debug.Log("EndScreen score string: " + s);
+            highScoreTextWin.text = s;
+        }
             
         
         Time.timeScale = 0;
@@ -180,7 +234,13 @@ public class GameManager : MonoBehaviour
         if (GameSettings.instance.selectedCharacter == "pacman")
             highScoreTextLose.text = "Score: " + _score;
         else
-            highScoreTextLose.text = "Score: " + (2620 - _score);
+        {
+            // Debug the exact string before assigning
+            var s = GameSettings.instance.selectedCharacter == "pacman"
+                ? "Score: " + _score
+                : "Score: " + (2620f - _score);
+            highScoreTextWin.text = s;
+        }
         
         Time.timeScale = 0;
     }
@@ -197,7 +257,10 @@ public class GameManager : MonoBehaviour
 
     private void UpdateScoreUI()
     {
-        scoreText.text = "Score: " + _score;
+        if(GameSettings.instance.selectedCharacter == "pacman")
+            scoreText.text = "Score: " + _score;
+        else
+            scoreText.text = "Score: " + (2620f - _score);
     }
     
     private int CountTiles(Tilemap tilemap)

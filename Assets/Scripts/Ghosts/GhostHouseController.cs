@@ -137,6 +137,16 @@ public class GhostHouseController : MonoBehaviour
 
         } while (releasedSomeone && safety < 10);
     }
+    
+    public void RegisterGhosts(GhostMovement pinkyRef, GhostMovement inkyRef, GhostMovement clydeRef)
+    {
+        pinky = pinkyRef;
+        inky = inkyRef;
+        clyde = clydeRef;
+
+        // Re-run release logic so Pinky (limit 0) leaves immediately
+        BeginLevel(level);
+    }
 
     private GhostMovement HighestPriorityGhostStillInHouse()
     {
