@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
         _ghostInstances.Clear();
         
         var j = 0;
-        for (int i = 0; i < GameSettings.instance.ghostAmount; i++)
+        for (int i = 0; i < 4; i++)
         {
             var ghostInstance = Instantiate(ghostPrefabs[j], ghostSpawn[j].position, Quaternion.identity);
             _ghostInstances.Add(ghostInstance);
