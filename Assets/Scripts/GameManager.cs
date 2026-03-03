@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     public void Start()
     {
         _pelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
-        _powerPelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
+        _powerPelletTilemapCollider2D = powerPelletTilemap.GetComponent<TilemapCollider2D>();
         _pelletMap = pelletTilemap.GetComponent<Tilemap>();
         _powerPelletMap = powerPelletTilemap.GetComponent<Tilemap>();
         
@@ -108,7 +108,8 @@ public class GameManager : MonoBehaviour
     {
         if (GameSettings.instance.selectedCharacter != "pacman")
         {
-            //TODO: Add pacman ai script
+            if (_pacmanInstance.GetComponent<PacManAI>() == null) 
+                _pacmanInstance.AddComponent<PacManAI>();
         }
         
         foreach (var ghost in _ghostInstances)
@@ -161,7 +162,12 @@ public class GameManager : MonoBehaviour
         gameLoseUI.SetActive(false);
         scoreText.enabled = false;
         
-        highScoreTextWin.text = "Score: " + _score;
+        if (GameSettings.instance.selectedCharacter == "pacman")
+            highScoreTextLose.text = "Score: " + _score;
+        else
+            highScoreTextLose.text = "Score: " + (2620 - _score);
+            
+        
         Time.timeScale = 0;
     }
 
@@ -170,8 +176,12 @@ public class GameManager : MonoBehaviour
         gameWinUI.SetActive(false);
         gameLoseUI.SetActive(true);
         scoreText.enabled = false;
+
+        if (GameSettings.instance.selectedCharacter == "pacman")
+            highScoreTextLose.text = "Score: " + _score;
+        else
+            highScoreTextLose.text = "Score: " + (2620 - _score);
         
-        highScoreTextLose.text = "Score: " + _score;
         Time.timeScale = 0;
     }
     

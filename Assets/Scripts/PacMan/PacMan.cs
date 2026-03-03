@@ -20,6 +20,11 @@ public class PacMan : MonoBehaviour
 
     private bool _isDead = false;
     
+    [SerializeField] private bool smoothRotation = true;
+    [SerializeField] private float rotationSpeed = 720f; // degrees per second when smoothing
+    [SerializeField] private float minMovementForRotation = 0.01f;
+    private Vector3 _previousPosition;
+    
     private void Start()
     {
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -56,6 +61,18 @@ public class PacMan : MonoBehaviour
                     OnCollisionWithGhost();
             }
         }
+        
+        RotateToMovementDirection();
+        _previousPosition = transform.position;
+    }
+    
+    private void RotateToMovementDirection()
+    {
+        Vector3 delta = transform.position - _previousPosition;
+        if (delta.magnitude < minMovementForRotation) return;
+
+        float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
     
     private void EatPellet()
