@@ -5,6 +5,13 @@ public class GhostMovement : MonoBehaviour
 {
     public enum Mode { Scatter, Chase, Frightened, Eaten }
 
+    [Header("House")]
+    [SerializeField] private Transform houseExitTarget; // empty object op de node NET buiten de deur
+    [SerializeField] private float exitSnapDistance = 0.05f;
+
+    public bool IsInHouse { get; private set; } = true;
+    private bool leavingHouse;
+
     [Header("Refs")]
     [SerializeField] private NodeGraphBuilder graph;
     [SerializeField] private Transform pacman;
@@ -34,10 +41,15 @@ public class GhostMovement : MonoBehaviour
     {
         if (!graph) { Debug.LogError("GhostMovement: graph ontbreekt."); enabled = false; return; }
 
+        // Alleen snap naar graph als je NIET in house start (of als je house nodes hebt)
         current = graph.GetClosestNode(transform.position);
+
+        // Als je wél house nodes hebt, is dit goed:
         transform.position = current.WorldPos;
 
         previous = null;
+
+        // Als hij nog in house zit: laat hem binnen bewegen totdat hij released is
         next = ChooseNextNode(current, previous);
     }
 
@@ -55,6 +67,16 @@ public class GhostMovement : MonoBehaviour
             previous = current;
             current = next;
             next = ChooseNextNode(current, previous);
+        }
+
+        // Als we leavingHouse zijn: check of we bij exit zijn
+        if (leavingHouse && houseExitTarget != null)
+        {
+            if ((transform.position - houseExitTarget.position).sqrMagnitude <= exitSnapDistance * exitSnapDistance)
+            {
+                leavingHouse = false;
+                // vanaf hier doet hij normaal scatter/chase keuzes
+            }
         }
     }
 
@@ -107,6 +129,10 @@ public class GhostMovement : MonoBehaviour
 
     private Vector3 GetTargetWorld()
     {
+        // Eerst naar de uitgang als we net released zijn
+        if (leavingHouse && houseExitTarget != null)
+            return houseExitTarget.position;
+
         switch (mode)
         {
             case Mode.Scatter:
@@ -156,5 +182,13 @@ public class GhostMovement : MonoBehaviour
             previous = next;
             next = temp;
         }
+    }
+
+    public void ReleaseFromHouse()
+    {
+        if (!IsInHouse) return;
+
+        IsInHouse = false;
+        leavingHouse = true;
     }
 }
