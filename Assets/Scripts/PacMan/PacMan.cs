@@ -19,10 +19,7 @@ public class PacMan : MonoBehaviour
     private List<BoxCollider2D> ghostColliders = new List<BoxCollider2D>();
 
     private bool _isDead = false;
-    
-    [SerializeField] private bool smoothRotation = true;
-    [SerializeField] private float rotationSpeed = 720f; // degrees per second when smoothing
-    [SerializeField] private float minMovementForRotation = 0.01f;
+    private readonly float minMovementForRotation = 0.01f;
     private Vector3 _previousPosition;
     
     private void Start()

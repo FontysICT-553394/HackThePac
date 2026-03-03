@@ -73,7 +73,7 @@ public class PacManAI : MonoBehaviour
 
         _pelletTilemap = GameObject.Find("pelletsTilemap").GetComponent<Tilemap>();
         _powerPelletTilemap = GameObject.Find("powerpelletsTilemap").GetComponent<Tilemap>();
-        wallLayer = LayerMask.GetMask("walls");
+        wallLayer = LayerMask.GetMask("Walls");
     }
 
     private void Update()
