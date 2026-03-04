@@ -181,11 +181,20 @@ public class GameManager : MonoBehaviour
             GhostHouseController.Instance.OnDotEaten();
         }
 
+        if (AchievementManager.Instance == null)
+        {
+            Debug.LogError("AchievementManager.Instance is null!");
+            return;
+        }
+
+        AchievementManager.Instance.AddProgress("pellets_eaten", 1);
+
         if (isPowerPellet)
         {
-            //TODO: Add power-up effect (eating ghosts)
+            //TODO: Add power-up effect
         }
     }
+
 
     public void PacManDied()
     {
@@ -217,7 +226,6 @@ public class GameManager : MonoBehaviour
             var s = GameSettings.instance.selectedCharacter == "pacman"
                 ? "Score: " + _score
                 : "Score: " + (2620f - _score);
-            Debug.Log("EndScreen score string: " + s);
             highScoreTextWin.text = s;
         }
             
