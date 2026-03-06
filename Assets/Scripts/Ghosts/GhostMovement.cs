@@ -103,7 +103,7 @@ public class GhostMovement : MonoBehaviour
 
     private void Update()
     {
-        // 1) In-house idle bobbing (not released yet)
+        // 1) In-house idle bobbing 
         if (IsInHouse && !leavingHouse)
         {
             bobTimer += Time.deltaTime * bobSpeed;
@@ -252,28 +252,13 @@ public class GhostMovement : MonoBehaviour
             options.Remove(cameFrom);
         }
 
-        // Frightened = random choice
-        // Frightened = flee from Pac-Man (pick node farthest from Pac-Man)
+        // Frightened = random choice (arcade-like)
         if (mode == Mode.Frightened)
         {
-            Vector3 pacPos = pacman ? pacman.position : transform.position;
-
-            NodeData farthest = null;
-            float farthestDist = -1f;
-
-            foreach (var opt in options)
-            {
-                float d = (opt.WorldPos - pacPos).sqrMagnitude;
-                if (d > farthestDist)
-                {
-                    farthestDist = d;
-                    farthest = opt;
-                }
-            }
-
-            return farthest ?? options[0];
+            if (options.Count == 0) return cameFrom;
+            int idx = Random.Range(0, options.Count);
+            return options[idx];
         }
-
 
         Vector3 target = GetTargetWorld();
 
@@ -353,30 +338,38 @@ public class GhostMovement : MonoBehaviour
 
         mode = newMode;
 
-        // Skip snap and reverse for Frightened — random movement doesn't need it
-        // and the axis mismatch causes teleportation
-        if (newMode == Mode.Frightened)
+        // If inside house or leaving, we don't manipulate path nodes physically
+        if (IsInHouse || leavingHouse || current == null || next == null)
             return;
 
-        // Snap to corridor line BEFORE reversing, using the current segment
-        if (current != null && next != null)
+        // 1. Snap to the CURRENT corridor axis to fix floating-point drift
+        // This is safe because we haven't changed segment yet.
+        Vector3 seg = next.WorldPos - current.WorldPos;
+        Vector3 p = transform.position;
+
+        if (Mathf.Abs(seg.x) > Mathf.Abs(seg.y))
+            p.y = current.WorldPos.y;
+        else
+            p.x = current.WorldPos.x;
+
+        transform.position = p;
+
+        // 2. Reverse direction by swapping current <-> next
+        if (reverseOnSwitch)
         {
-            Vector3 seg = next.WorldPos - current.WorldPos;
-            Vector3 p = transform.position;
+            // Instead of next = previous (which changes the axis to the PREVIOUS path segment 
+            // and forces a teleport-snap), we simply swap current and next.
+            // This reverses the ghost along the EXACT SAME segment it is currently on.
+            NodeData temp = current;
+            current = next;
+            next = temp;
 
-            if (Mathf.Abs(seg.x) > Mathf.Abs(seg.y)) p.y = current.WorldPos.y;
-            else p.x = current.WorldPos.x;
-
-            transform.position = p;
-        }
-
-        // Reverse direction after snapping
-        if (reverseOnSwitch && !IsInHouse && !leavingHouse && current != null && next != null && previous != null)
-        {
-            next = previous;
+            // Note: 'previous' is not updated here, but that's okay.
+            // When we arrive at 'next' (the old 'current'), 
+            // the standard arrival logic will update 'previous = current' (old 'next').
         }
     }
-    
+
     public void ReleaseFromHouse()
     {
         if (!IsInHouse) return;
