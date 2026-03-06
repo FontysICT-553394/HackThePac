@@ -126,6 +126,8 @@ GameObject:
   - component: {fileID: 2948346756312934901}
   - component: {fileID: 6341471727533260222}
   - component: {fileID: -2163328734578658312}
+  - component: {fileID: -3748449305663230900}
+  - component: {fileID: 4127794223072454941}
   m_Layer: 9
   m_Name: blinky
   m_TagString: Untagged
@@ -302,3 +304,41 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-3748449305663230900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7942176720447830912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4182c9288b59ff4bb93a237455622f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostAI
+  type: 0
+  movement: {fileID: 0}
+  pacman: {fileID: 6279040889155693017, guid: 836eb250b245042859f67c891ebe5732, type: 3}
+  blinkyForInky: {fileID: 0}
+  pinkyAheadTiles: 4
+  inkyAheadTiles: 2
+  clydeChaseDistanceTiles: 8
+--- !u!114 &4127794223072454941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7942176720447830912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d0068310e48b0a4bb33fd754eaa0ef5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostAIAuto
+  type: 0
+  pacman: {fileID: 0}
+  registry: {fileID: 6498682826659082122, guid: e9c72c15675bf4f40b0d761fb7e3a77a, type: 3}
+  findEveryFrames: 10
+  pinkyAheadTiles: 4
+  inkyAheadTiles: 2
+  clydeChaseDistanceTiles: 8
