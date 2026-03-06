@@ -253,10 +253,27 @@ public class GhostMovement : MonoBehaviour
         }
 
         // Frightened = random choice
+        // Frightened = flee from Pac-Man (pick node farthest from Pac-Man)
         if (mode == Mode.Frightened)
         {
-            return options[Random.Range(0, options.Count)];
+            Vector3 pacPos = pacman ? pacman.position : transform.position;
+
+            NodeData farthest = null;
+            float farthestDist = -1f;
+
+            foreach (var opt in options)
+            {
+                float d = (opt.WorldPos - pacPos).sqrMagnitude;
+                if (d > farthestDist)
+                {
+                    farthestDist = d;
+                    farthest = opt;
+                }
+            }
+
+            return farthest ?? options[0];
         }
+
 
         Vector3 target = GetTargetWorld();
 
@@ -331,19 +348,17 @@ public class GhostMovement : MonoBehaviour
 
     public void SetMode(Mode newMode, bool reverseOnSwitch)
     {
-        if (mode == newMode) return;
+        if (mode == newMode)
+            return;
 
         mode = newMode;
 
-        // Arcade behavior: reverse immediately on scatter/chase switch (only when in maze)
-        if (reverseOnSwitch && previous != null && !IsInHouse && !leavingHouse && next != null)
-        {
-            var temp = previous;
-            previous = next;
-            next = temp;
-        }
+        // Skip snap and reverse for Frightened — random movement doesn't need it
+        // and the axis mismatch causes teleportation
+        if (newMode == Mode.Frightened)
+            return;
 
-        // Snap to corridor line before reversing (prevents diagonal cuts)
+        // Snap to corridor line BEFORE reversing, using the current segment
         if (current != null && next != null)
         {
             Vector3 seg = next.WorldPos - current.WorldPos;
@@ -354,8 +369,14 @@ public class GhostMovement : MonoBehaviour
 
             transform.position = p;
         }
-    }
 
+        // Reverse direction after snapping
+        if (reverseOnSwitch && !IsInHouse && !leavingHouse && current != null && next != null && previous != null)
+        {
+            next = previous;
+        }
+    }
+    
     public void ReleaseFromHouse()
     {
         if (!IsInHouse) return;

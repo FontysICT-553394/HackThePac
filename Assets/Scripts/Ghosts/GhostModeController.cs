@@ -27,11 +27,11 @@ public class GhostModeController : MonoBehaviour
     private void Start()
     {
         BuildSchedule();
+        // Don't cache here — ghosts aren't spawned yet
     }
 
     private void Update()
     {
-        // Zoek automatisch nieuwe GhostMovement scripts
         FindGhosts();
 
         if (phases.Count == 0) return;
@@ -52,12 +52,17 @@ public class GhostModeController : MonoBehaviour
 
     void FindGhosts()
     {
-        GhostMovement[] found = FindObjectsOfType<GhostMovement>();
+        ghosts.RemoveAll(g => g == null);
 
-        foreach (var g in found)
+        // Only search when list is incomplete (avoids per-frame allocation)
+        if (ghosts.Count < 4)
         {
-            if (!ghosts.Contains(g))
-                ghosts.Add(g);
+            var found = FindObjectsOfType<GhostMovement>();
+            foreach (var g in found)
+            {
+                if (!ghosts.Contains(g))
+                    ghosts.Add(g);
+            }
         }
     }
 
@@ -73,8 +78,6 @@ public class GhostModeController : MonoBehaviour
     void BuildSchedule()
     {
         phases.Clear();
-
-        // Pac-Man level 1 timing
         phases.Add(new Phase(GhostMovement.Mode.Scatter, 7f));
         phases.Add(new Phase(GhostMovement.Mode.Chase, 20f));
         phases.Add(new Phase(GhostMovement.Mode.Scatter, 7f));
@@ -85,12 +88,14 @@ public class GhostModeController : MonoBehaviour
 
     public void TriggerFrightened(float duration)
     {
+        FindGhosts(); // Ensure list is up to date before applying
         foreach (var g in ghosts)
         {
             if (g != null)
                 g.SetMode(GhostMovement.Mode.Frightened, true);
         }
 
+        CancelInvoke(nameof(EndFrightened)); // Cancel any existing timer
         Invoke(nameof(EndFrightened), duration);
     }
 

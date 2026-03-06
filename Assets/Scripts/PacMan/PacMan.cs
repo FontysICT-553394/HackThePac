@@ -127,8 +127,7 @@ public class PacMan : MonoBehaviour
             // Start power-up
             isPoweredUp = true;
             powerTimer = powerDuration;
-
-            // Trigger frightened mode for ghosts
+            
             if (_ghostModeController != null)
                 _ghostModeController.TriggerFrightened(powerDuration);
         }

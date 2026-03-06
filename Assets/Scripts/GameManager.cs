@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.TextCore.Text;
 using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
@@ -179,11 +178,6 @@ public class GameManager : MonoBehaviour
         {
             tilemap.SetTile(cellPos, null);
             GhostHouseController.Instance.OnDotEaten();
-        }
-
-        if (isPowerPellet)
-        {
-            //TODO: Add power-up effect (eating ghosts)
         }
     }
 
