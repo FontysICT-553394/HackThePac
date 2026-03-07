@@ -3362,6 +3362,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1136104690}
   m_CullTransparentMesh: 1
+--- !u!1 &1198130627
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1198130628}
+  m_Layer: 0
+  m_Name: GhostHouseRespawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1198130628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198130627}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4, y: -2.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1202722677
 GameObject:
   m_ObjectHideFlags: 0
@@ -12784,6 +12815,7 @@ MonoBehaviour:
   highScoreTextWin: {fileID: 1799700034}
   gameWinUI: {fileID: 709059081}
   gameLoseUI: {fileID: 1251685889}
+  _ghostHouseRespawnPoint: {fileID: 1198130628}
 --- !u!4 &2082219319
 Transform:
   m_ObjectHideFlags: 0
@@ -12993,3 +13025,4 @@ SceneRoots:
   - {fileID: 345770124}
   - {fileID: 994515981}
   - {fileID: 543360050}
+  - {fileID: 1198130628}

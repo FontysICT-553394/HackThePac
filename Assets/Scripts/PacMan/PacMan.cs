@@ -11,6 +11,9 @@ public class PacMan : MonoBehaviour
     private float powerTimer;
     private GhostModeController _ghostModeController;
 
+    private readonly int[] ghostEatScores = { 200, 400, 800, 1600 };
+    private int ghostsEatenThisPower = 0;
+
     private GameManager _gameManager;
     private GameObject _pelletTilemap;
     private GameObject _powerPelletTilemap;
@@ -45,7 +48,6 @@ public class PacMan : MonoBehaviour
 
         _ghostModeController = FindObjectOfType<GhostModeController>();
 
-        // Ghost colliders (can be null if not spawned yet)
         var blinkyObj = GameObject.Find("blinky(Clone)") ?? GameObject.Find("blinky");
         var pinkyObj = GameObject.Find("pinky(Clone)") ?? GameObject.Find("pinky");
         var inkyObj = GameObject.Find("inky(Clone)") ?? GameObject.Find("inky");
@@ -65,24 +67,26 @@ public class PacMan : MonoBehaviour
         if (_powerPelletTilemapCollider2D.IsTouching(_pacmanCollider2D))
             EatPowerPellet();
 
-        // Power timer countdown
         if (isPoweredUp)
         {
             powerTimer -= Time.deltaTime;
             if (powerTimer <= 0f)
             {
                 isPoweredUp = false;
+                ghostsEatenThisPower = 0;
             }
         }
 
-        // Ghost collision only kills when NOT powered
-        if (!isPoweredUp)
+        foreach (var ghostCollider in ghostColliders)
         {
-            foreach (var ghostCollider in ghostColliders)
-            {
-                if (ghostCollider != null && _pacmanCollider2D.IsTouching(ghostCollider) && !_isDead)
-                    OnCollisionWithGhost();
-            }
+            if (ghostCollider == null) continue;
+            if (!_pacmanCollider2D.IsTouching(ghostCollider)) continue;
+            if (_isDead) break;
+
+            if (isPoweredUp)
+                TryEatGhost(ghostCollider);
+            else
+                OnCollisionWithGhost();
         }
 
         RotateToMovementDirection();
@@ -94,7 +98,6 @@ public class PacMan : MonoBehaviour
         Vector3 delta = transform.position - _previousPosition;
         if (delta.magnitude < minMovementForRotation) return;
 
-        // cardinal direction (grid-style)
         if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             MoveDir = delta.x > 0 ? Vector2Int.right : Vector2Int.left;
         else
@@ -124,18 +127,30 @@ public class PacMan : MonoBehaviour
             _gameManager.PelletEaten(_powerPelletTilemapComponent, cellPos, true);
             _gameManager.AddScore(50f);
 
-            // Start power-up
             isPoweredUp = true;
             powerTimer = powerDuration;
-            
+            ghostsEatenThisPower = 0;
+
             if (_ghostModeController != null)
                 _ghostModeController.TriggerFrightened(powerDuration);
         }
     }
 
+    private void TryEatGhost(BoxCollider2D ghostCollider)
+    {
+        GhostMovement ghostMovement = ghostCollider.GetComponent<GhostMovement>();
+        if (ghostMovement == null) return;
+        if (!ghostMovement.CanBeEaten) return;
+
+        int scoreIndex = Mathf.Min(ghostsEatenThisPower, ghostEatScores.Length - 1);
+        _gameManager.AddScore(ghostEatScores[scoreIndex]);
+        ghostsEatenThisPower++;
+
+        ghostMovement.OnEatenByPacman();
+    }
+
     private void OnCollisionWithGhost()
     {
-        // GhostHouseController.Instance.OnLifeLost();
         _isDead = true;
         _gameManager.PacManDied();
     }

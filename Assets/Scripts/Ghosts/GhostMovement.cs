@@ -13,6 +13,7 @@ public class GhostMovement : MonoBehaviour
 
     [Header("House")]
     [SerializeField] public Transform houseExitTarget;
+    [SerializeField] public Transform houseRespawnPoint;
     [SerializeField] private float exitSnapDistance = 0.05f;
 
     [Header("House Bobbing")]
@@ -36,17 +37,14 @@ public class GhostMovement : MonoBehaviour
     [Header("Scatter Target (world pos)")]
     [SerializeField] public Vector2 scatterCornerWorld = new(12, 10);
 
-    // --- Public read/AI hooks ---
     public Mode CurrentMode => mode;
+    public bool CanBeEaten => mode == Mode.Frightened && !IsInHouse && !leavingHouse;
 
-    // Per-ghost AI can override chase target (Blinky/Pinky/Inky/Clyde)
     public bool UseChaseOverride { get; set; }
     public Vector3 ChaseTargetOverride { get; set; }
 
-    // Last movement direction (cardinal)
     public Vector2Int CurrentMoveDir { get; private set; } = Vector2Int.left;
 
-    // node state
     private NodeData current;
     private NodeData previous;
     private NodeData next;
@@ -55,7 +53,6 @@ public class GhostMovement : MonoBehaviour
 
     private float bobTimer;
 
-    // Classic tie-break (arcade-ish): Up, Left, Down, Right
     private static readonly Vector2Int[] TieBreakOrder =
     {
         Vector2Int.up,
@@ -75,23 +72,19 @@ public class GhostMovement : MonoBehaviour
 
         if (startsOutsideHouse)
         {
-            // Blinky: smoothly move to nearest node (no snap)
             IsInHouse = false;
-
-            // reuse leaving state so Update() calls HandleHouseExit()
             leavingHouse = true;
-
-            // skip Phase 1 & 2, go straight to Phase 3
             movingToFirstNode = true;
-
             firstNode = graph.GetClosestNode(transform.position);
         }
         else
         {
-            // Pinky/Inky/Clyde: stay in house, remember home position
             IsInHouse = true;
             leavingHouse = false;
-            houseHomePos = transform.position;
+            houseHomePos = houseRespawnPoint ? houseRespawnPoint.position : transform.position;
+
+            // zet hem meteen netjes op home pos als er een respawn point is
+            transform.position = houseHomePos;
 
             bobTimer = Random.Range(0f, Mathf.PI * 2f);
 
@@ -103,7 +96,6 @@ public class GhostMovement : MonoBehaviour
 
     private void Update()
     {
-        // 1) In-house idle bobbing 
         if (IsInHouse && !leavingHouse)
         {
             bobTimer += Time.deltaTime * bobSpeed;
@@ -112,33 +104,27 @@ public class GhostMovement : MonoBehaviour
             return;
         }
 
-        // 2) Leaving house (3-phase)
         if (leavingHouse)
         {
             HandleHouseExit();
             return;
         }
 
-        // 3) Normal node-to-node movement
         if (current == null || next == null) return;
 
         Vector3 before = transform.position;
-        // Normal pathfinding movement (axis-locked)
         Vector3 pos = transform.position;
 
-        // welke richting is deze segment? (node->node is altijd horizontaal of verticaal)
         Vector3 seg = next.WorldPos - current.WorldPos;
 
         if (Mathf.Abs(seg.x) > Mathf.Abs(seg.y))
         {
-            // horizontaal segment: Y vastzetten op current node lijn
             pos.y = current.WorldPos.y;
             float newX = Mathf.MoveTowards(pos.x, next.WorldPos.x, speed * Time.deltaTime);
             pos.x = newX;
         }
         else
         {
-            // verticaal segment: X vastzetten op current node lijn
             pos.x = current.WorldPos.x;
             float newY = Mathf.MoveTowards(pos.y, next.WorldPos.y, speed * Time.deltaTime);
             pos.y = newY;
@@ -146,7 +132,6 @@ public class GhostMovement : MonoBehaviour
 
         transform.position = pos;
 
-        // track direction
         Vector3 delta = transform.position - before;
         if (delta.sqrMagnitude > 0.000001f)
         {
@@ -156,7 +141,6 @@ public class GhostMovement : MonoBehaviour
                 CurrentMoveDir = delta.y > 0 ? Vector2Int.up : Vector2Int.down;
         }
 
-        // arrived at node
         if ((transform.position - next.WorldPos).sqrMagnitude < 0.0001f)
         {
             transform.position = next.WorldPos;
@@ -168,7 +152,6 @@ public class GhostMovement : MonoBehaviour
 
     private void HandleHouseExit()
     {
-        // If no exit target, fail gracefully: snap to closest node and start normal movement
         if (houseExitTarget == null)
         {
             firstNode = graph.GetClosestNode(transform.position);
@@ -181,7 +164,6 @@ public class GhostMovement : MonoBehaviour
             return;
         }
 
-        // Phase 3: Smoothly move to the first graph node (no snap)
         if (movingToFirstNode)
         {
             transform.position = Vector3.MoveTowards(transform.position, firstNode.WorldPos, houseExitSpeed * Time.deltaTime);
@@ -199,7 +181,6 @@ public class GhostMovement : MonoBehaviour
             return;
         }
 
-        // Phase 1: Align horizontally with exit (x)
         Vector3 centerAlign = new Vector3(houseExitTarget.position.x, transform.position.y, transform.position.z);
 
         if (Mathf.Abs(transform.position.x - houseExitTarget.position.x) > exitSnapDistance)
@@ -207,7 +188,6 @@ public class GhostMovement : MonoBehaviour
             Vector3 before = transform.position;
             transform.position = Vector3.MoveTowards(transform.position, centerAlign, houseExitSpeed * Time.deltaTime);
 
-            // direction track while exiting
             Vector3 d = transform.position - before;
             if (d.sqrMagnitude > 0.000001f)
                 CurrentMoveDir = d.x > 0 ? Vector2Int.right : Vector2Int.left;
@@ -215,7 +195,6 @@ public class GhostMovement : MonoBehaviour
             return;
         }
 
-        // Phase 2: Move toward the exit point
         {
             Vector3 before = transform.position;
             transform.position = Vector3.MoveTowards(transform.position, houseExitTarget.position, houseExitSpeed * Time.deltaTime);
@@ -232,7 +211,6 @@ public class GhostMovement : MonoBehaviour
 
         if ((transform.position - houseExitTarget.position).sqrMagnitude <= exitSnapDistance * exitSnapDistance)
         {
-            // Arrived at exit — start Phase 3: smoothly move to nearest node
             transform.position = houseExitTarget.position;
             firstNode = graph.GetClosestNode(transform.position);
             movingToFirstNode = true;
@@ -245,14 +223,11 @@ public class GhostMovement : MonoBehaviour
 
         if (options.Count == 0) return cameFrom;
 
-        // Don't allow reversing in normal movement, unless it's the only way.
-        // While leavingHouse we allow reverse so it can always reach exit correctly.
         if (!leavingHouse && cameFrom != null && options.Count > 1)
         {
             options.Remove(cameFrom);
         }
 
-        // Frightened = random choice (arcade-like)
         if (mode == Mode.Frightened)
         {
             if (options.Count == 0) return cameFrom;
@@ -262,7 +237,6 @@ public class GhostMovement : MonoBehaviour
 
         Vector3 target = GetTargetWorld();
 
-        // Pick option with min distance to target; tie-break by classic direction priority
         NodeData best = null;
         float bestDist = float.PositiveInfinity;
 
@@ -300,8 +274,9 @@ public class GhostMovement : MonoBehaviour
                 return pacman ? pacman.position : transform.position;
 
             case Mode.Eaten:
-                // later: return-to-house target; for now just go to exit target if set
-                return houseExitTarget ? houseExitTarget.position : transform.position;
+                return houseRespawnPoint ? houseRespawnPoint.position :
+                       houseExitTarget ? houseExitTarget.position :
+                       transform.position;
 
             case Mode.Frightened:
             default:
@@ -338,12 +313,9 @@ public class GhostMovement : MonoBehaviour
 
         mode = newMode;
 
-        // If inside house or leaving, we don't manipulate path nodes physically
         if (IsInHouse || leavingHouse || current == null || next == null)
             return;
 
-        // 1. Snap to the CURRENT corridor axis to fix floating-point drift
-        // This is safe because we haven't changed segment yet.
         Vector3 seg = next.WorldPos - current.WorldPos;
         Vector3 p = transform.position;
 
@@ -354,19 +326,11 @@ public class GhostMovement : MonoBehaviour
 
         transform.position = p;
 
-        // 2. Reverse direction by swapping current <-> next
         if (reverseOnSwitch)
         {
-            // Instead of next = previous (which changes the axis to the PREVIOUS path segment 
-            // and forces a teleport-snap), we simply swap current and next.
-            // This reverses the ghost along the EXACT SAME segment it is currently on.
             NodeData temp = current;
             current = next;
             next = temp;
-
-            // Note: 'previous' is not updated here, but that's okay.
-            // When we arrive at 'next' (the old 'current'), 
-            // the standard arrival logic will update 'previous = current' (old 'next').
         }
     }
 
@@ -376,6 +340,36 @@ public class GhostMovement : MonoBehaviour
 
         IsInHouse = false;
         leavingHouse = true;
-        movingToFirstNode = false; // start phase 1/2/3 from inside
+        movingToFirstNode = false;
+    }
+
+    public void OnEatenByPacman()
+    {
+        if (!CanBeEaten) return;
+
+        mode = Mode.Eaten;
+        UseChaseOverride = false;
+
+        Vector3 respawnPos =
+            houseRespawnPoint ? houseRespawnPoint.position :
+            houseExitTarget ? houseExitTarget.position :
+            transform.position;
+
+        transform.position = respawnPos;
+        houseHomePos = respawnPos;
+
+        IsInHouse = true;
+        leavingHouse = false;
+        movingToFirstNode = false;
+
+        current = null;
+        previous = null;
+        next = null;
+        firstNode = null;
+
+        bobTimer = Random.Range(0f, Mathf.PI * 2f);
+
+        // zet hem weer op scatter zodat hij later normaal kan releasen
+        mode = Mode.Scatter;
     }
 }

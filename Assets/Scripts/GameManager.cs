@@ -27,8 +27,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text highScoreTextWin;
     [SerializeField] private GameObject gameWinUI;
     [SerializeField] private GameObject gameLoseUI;
-    
-    
+
+    [SerializeField] private Transform _ghostHouseRespawnPoint;
+
     private float _score = 0f;
     
     private GameObject _pacmanInstance;
@@ -128,6 +129,7 @@ public class GameManager : MonoBehaviour
             ai.graph = _nodeGraphBuilder;
             ai.pacman = _pacmanInstance.transform;
             ai.houseExitTarget = _houseExitTarget;
+            ai.houseRespawnPoint = _ghostHouseRespawnPoint;
 
             if (ghost.name.IndexOf("blinky", StringComparison.OrdinalIgnoreCase) >= 0)
             {
