@@ -10,11 +10,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -1955163440068653753, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
       propertyPath: obstacleLayer.m_Bits
-      value: 128
+      value: 2048
       objectReference: {fileID: 0}
     - target: {fileID: 622914332600983866, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
       propertyPath: m_Name
-      value: ghost_Clyde
+      value: Ghost_Clyde
+      objectReference: {fileID: 0}
+    - target: {fileID: 2243814035493525690, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
+      propertyPath: duration
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 4519865883664714403, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
+      propertyPath: initialBehavior
+      value: 
+      objectReference: {fileID: 61437022544254194}
+    - target: {fileID: 4945733000715941207, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4945733000715941207, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
+      propertyPath: m_Color.g
+      value: 0.37277257
+      objectReference: {fileID: 0}
+    - target: {fileID: 4945733000715941207, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6838320991750696090, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -61,3 +81,14 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
+--- !u!114 &61437022544254194 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2243814035493525690, guid: 4b8879ad642c2584cb441e717854f05b, type: 3}
+  m_PrefabInstance: {fileID: 2304123783724551240}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1839df7e890017240be18757e3203605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostHome

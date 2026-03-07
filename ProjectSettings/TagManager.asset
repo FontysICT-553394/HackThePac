@@ -14,11 +14,11 @@ TagManager:
   - background
   - Walls
   - sprite
-  - Ghosts
+  - Ghost
   - Node
   - Obstacle
-  - 
-  - 
+  - Pellet
+  - Pacman
   - 
   - 
   - 
