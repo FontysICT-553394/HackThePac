@@ -9,7 +9,7 @@ public class PacMan : MonoBehaviour
     [Header("Power Pellet")]
     [SerializeField] private float powerDuration = 6f;
     private float powerTimer;
-    private GhostModeController _ghostModeController;
+    //private GhostModeController _ghostModeController;
 
     private readonly int[] ghostEatScores = { 200, 400, 800, 1600 };
     private int ghostsEatenThisPower = 0;
@@ -46,7 +46,7 @@ public class PacMan : MonoBehaviour
         _pelletTilemapCollider2D = _pelletTilemap.GetComponent<TilemapCollider2D>();
         _powerPelletTilemapCollider2D = _powerPelletTilemap.GetComponent<TilemapCollider2D>();
 
-        _ghostModeController = FindObjectOfType<GhostModeController>();
+        //_ghostModeController = FindObjectOfType<GhostModeController>();
 
         var blinkyObj = GameObject.Find("blinky(Clone)") ?? GameObject.Find("blinky");
         var pinkyObj = GameObject.Find("pinky(Clone)") ?? GameObject.Find("pinky");
@@ -83,8 +83,8 @@ public class PacMan : MonoBehaviour
             if (!_pacmanCollider2D.IsTouching(ghostCollider)) continue;
             if (_isDead) break;
 
-            if (isPoweredUp)
-                TryEatGhost(ghostCollider);
+            //if (isPoweredUp)
+            //    TryEatGhost(ghostCollider);
             else
                 OnCollisionWithGhost();
         }
@@ -131,23 +131,23 @@ public class PacMan : MonoBehaviour
             powerTimer = powerDuration;
             ghostsEatenThisPower = 0;
 
-            if (_ghostModeController != null)
-                _ghostModeController.TriggerFrightened(powerDuration);
+            //if (_ghostModeController != null)
+            //    _ghostModeController.TriggerFrightened(powerDuration);
         }
     }
 
-    private void TryEatGhost(BoxCollider2D ghostCollider)
-    {
-        GhostMovement ghostMovement = ghostCollider.GetComponent<GhostMovement>();
-        if (ghostMovement == null) return;
-        if (!ghostMovement.CanBeEaten) return;
+    //private void TryEatGhost(BoxCollider2D ghostCollider)
+    //{
+    //    GhostMovement ghostMovement = ghostCollider.GetComponent<GhostMovement>();
+    //    if (ghostMovement == null) return;
+    //    if (!ghostMovement.CanBeEaten) return;
 
-        int scoreIndex = Mathf.Min(ghostsEatenThisPower, ghostEatScores.Length - 1);
-        _gameManager.AddScore(ghostEatScores[scoreIndex]);
-        ghostsEatenThisPower++;
+    //    int scoreIndex = Mathf.Min(ghostsEatenThisPower, ghostEatScores.Length - 1);
+    //    _gameManager.AddScore(ghostEatScores[scoreIndex]);
+    //    ghostsEatenThisPower++;
 
-        ghostMovement.OnEatenByPacman();
-    }
+    //    ghostMovement.OnEatenByPacman();
+    //}
 
     private void OnCollisionWithGhost()
     {

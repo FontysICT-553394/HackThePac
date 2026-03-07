@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.TextCore.Text;
 using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
+
     [Header("PacMan Settings")]
     [SerializeField] private GameObject pacmanPrefab;
     [SerializeField] private Transform pacmanSpawnPoint;
-    
+
     [Header("Ghost Settings")]
     [SerializeField] private List<GameObject> ghostPrefabs;
     [SerializeField] private List<Transform> ghostSpawn;
-    
+
     [Header("Game Settings")]
     [SerializeField] private GameObject pelletTilemap;
     [SerializeField] private GameObject powerPelletTilemap;
     [SerializeField] private NodeGraphBuilder _nodeGraphBuilder;
     [SerializeField] private Transform _houseExitTarget;
-    
+
     [Header("Game UI")]
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text highScoreTextLose;
@@ -28,17 +32,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameWinUI;
     [SerializeField] private GameObject gameLoseUI;
 
-    [SerializeField] private Transform _ghostHouseRespawnPoint;
 
     private float _score = 0f;
-    
+
     private GameObject _pacmanInstance;
     private List<GameObject> _ghostInstances = new List<GameObject>();
     private Tilemap _pelletMap;
     private Tilemap _powerPelletMap;
     private TilemapCollider2D _powerPelletTilemapCollider2D;
     private TilemapCollider2D _pelletTilemapCollider2D;
-    
+
+    private int ghostMultiplier = 1;
+
     // Colliders
     private BoxCollider2D _pacmanCollider2D;
 
@@ -48,14 +53,14 @@ public class GameManager : MonoBehaviour
         _powerPelletTilemapCollider2D = powerPelletTilemap.GetComponent<TilemapCollider2D>();
         _pelletMap = pelletTilemap.GetComponent<Tilemap>();
         _powerPelletMap = powerPelletTilemap.GetComponent<Tilemap>();
-        
+
         InstantiatePacman();
         InstantiateGhosts();
-        
+
         AddPlayerScriptToPlayer();
         AddAiScriptToEnemies();
     }
-    
+
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -72,16 +77,16 @@ public class GameManager : MonoBehaviour
         if (pelletsLeft <= 0)
             AllPelletsEaten();
     }
-    
+
     private void InstantiatePacman()
     {
         if (_pacmanInstance != null)
             Destroy(_pacmanInstance);
-        
+
         _pacmanInstance = Instantiate(pacmanPrefab, pacmanSpawnPoint.position, Quaternion.identity);
         _pacmanCollider2D = _pacmanInstance.GetComponent<BoxCollider2D>();
     }
-    
+
     private void InstantiateGhosts()
     {
         foreach (var ghost in _ghostInstances)
@@ -120,43 +125,8 @@ public class GameManager : MonoBehaviour
                     StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            // Remove any pre-existing GhostMovement from the prefab
-            var existing = ghost.GetComponent<GhostMovement>();
-            if (existing != null)
-                Destroy(existing);
-
-            GhostMovement ai = ghost.AddComponent<GhostMovement>();
-            ai.graph = _nodeGraphBuilder;
-            ai.pacman = _pacmanInstance.transform;
-            ai.houseExitTarget = _houseExitTarget;
-            ai.houseRespawnPoint = _ghostHouseRespawnPoint;
-
-            if (ghost.name.IndexOf("blinky", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                ai.startsOutsideHouse = true;
-                ai.scatterCornerWorld = new Vector2(12, 10);
-            }
+            //TODO: Add ghost movement on them later (dynamicaly)
         }
-        
-        GhostMovement pinkyAi = null, inkyAi = null, clydeAi = null;
-
-        foreach (var ghost in _ghostInstances)
-        {
-            var ai = ghost.GetComponent<GhostMovement>();
-            if (ai == null) continue;
-
-            if (ghost.name.IndexOf("pinky", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                pinkyAi = ai;
-            else if (ghost.name.IndexOf("inky", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                inkyAi = ai;
-            else if (ghost.name.IndexOf("clyde", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                clydeAi = ai;
-        }
-
-        if (GhostHouseController.Instance != null)
-            GhostHouseController.Instance.RegisterGhosts(pinkyAi, inkyAi, clydeAi);
-        else
-            Debug.LogError("GhostHouseController.Instance is null — make sure it exists in the scene.");
     }
 
 
@@ -167,7 +137,7 @@ public class GameManager : MonoBehaviour
         var character = GameObject.Find(playerCharacterName + "(Clone)");
         character.AddComponent<PlayerMovement>().wallLayer = LayerMask.GetMask("walls");
     }
-    
+
     /// <summary>
     /// Handles pellet consumption and score updates. If it's a power pellet, also triggers the power-up effect.
     /// </summary>
@@ -179,9 +149,22 @@ public class GameManager : MonoBehaviour
         if (tilemap.HasTile(cellPos))
         {
             tilemap.SetTile(cellPos, null);
-            GhostHouseController.Instance.OnDotEaten();
         }
+
+        //if (AchievementManager.Instance == null)
+        //{
+        //    Debug.LogError("AchievementManager.Instance is null!");
+        //    return;
+        //}
+
+        //AchievementManager.Instance.AddProgress("pellets_eaten", 1);
+
+        //if (isPowerPellet)
+        //{
+        //    //TODO: Add power-up effect
+        //}
     }
+
 
     public void PacManDied()
     {
@@ -204,7 +187,7 @@ public class GameManager : MonoBehaviour
         gameWinUI.SetActive(true);
         gameLoseUI.SetActive(false);
         scoreText.enabled = false;
-        
+
         if (GameSettings.instance.selectedCharacter == "pacman")
             highScoreTextLose.text = "Score: " + _score;
         else
@@ -213,11 +196,10 @@ public class GameManager : MonoBehaviour
             var s = GameSettings.instance.selectedCharacter == "pacman"
                 ? "Score: " + _score
                 : "Score: " + (2620f - _score);
-            Debug.Log("EndScreen score string: " + s);
             highScoreTextWin.text = s;
         }
-            
-        
+
+
         Time.timeScale = 0;
     }
 
@@ -237,10 +219,10 @@ public class GameManager : MonoBehaviour
                 : "Score: " + (2620f - _score);
             highScoreTextWin.text = s;
         }
-        
+
         Time.timeScale = 0;
     }
-    
+
     /// <summary>
     /// Add score to the player's total score and updates the UI accordingly.
     /// </summary>
@@ -253,12 +235,12 @@ public class GameManager : MonoBehaviour
 
     private void UpdateScoreUI()
     {
-        if(GameSettings.instance.selectedCharacter == "pacman")
+        if (GameSettings.instance.selectedCharacter == "pacman")
             scoreText.text = "Score: " + _score;
         else
             scoreText.text = "Score: " + (2620f - _score);
     }
-    
+
     private int CountTiles(Tilemap tilemap)
     {
         if (tilemap == null) return 0;
@@ -275,9 +257,19 @@ public class GameManager : MonoBehaviour
         }
         return count;
     }
-    
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Time.timeScale = 1f;
     }
+
+
+    public void GhostEaten(Ghost ghost)
+    {
+        //int points = ghost.points * ghostMultiplier;
+        //SetScore(score + points);
+
+        //ghostMultiplier++;
+    }
+
 }
