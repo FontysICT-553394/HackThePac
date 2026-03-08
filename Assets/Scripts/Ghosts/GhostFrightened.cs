@@ -9,7 +9,7 @@ public class GhostFrightened : GhostBehavior
     public SpriteRenderer blue;
     public SpriteRenderer white;
 
-    private bool eaten;
+    public bool eaten;
 
     public override void Enable(float duration)
     {
@@ -33,17 +33,35 @@ public class GhostFrightened : GhostBehavior
         white.enabled = false;
     }
 
-    private void Eaten()
+    public void Eaten()
     {
         eaten = true;
-        ghost.SetPosition(ghost.home.inside.position);
-        ghost.home.Enable(duration);
-
+        if (ghost.home != null)
+        {
+            ghost.SetPosition(ghost.home.inside.position);
+            ghost.home.Enable(duration);
+        }
         body.enabled = false;
         eyes.enabled = true;
         blue.enabled = false;
         white.enabled = false;
     }
+
+    private void OnEnable()
+    {
+        blue.GetComponent<AnimatedSprite>().Restart();
+        if (ghost.movement != null)
+            ghost.movement.speedMultiplier = 0.5f;
+        eaten = false;
+    }
+
+    private void OnDisable()
+    {
+        if (ghost.movement != null)
+            ghost.movement.speedMultiplier = 1f;
+        eaten = false;
+    }
+
 
     private void Flash()
     {
@@ -53,19 +71,6 @@ public class GhostFrightened : GhostBehavior
             white.enabled = true;
             white.GetComponent<AnimatedSprite>().Restart();
         }
-    }
-
-    private void OnEnable()
-    {
-        blue.GetComponent<AnimatedSprite>().Restart();
-        ghost.movement.speedMultiplier = 0.5f;
-        eaten = false;
-    }
-
-    private void OnDisable()
-    {
-        ghost.movement.speedMultiplier = 1f;
-        eaten = false;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

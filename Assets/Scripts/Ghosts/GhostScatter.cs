@@ -6,7 +6,8 @@ public class GhostScatter : GhostBehavior
 {
     private void OnDisable()
     {
-        ghost.chase.Enable();
+        if (ghost.chase != null)
+            ghost.chase.Enable();
     }
 
     private void OnTriggerEnter2D(Collider2D other)

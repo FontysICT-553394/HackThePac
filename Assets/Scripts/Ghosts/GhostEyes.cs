@@ -19,6 +19,8 @@ public class GhostEyes : MonoBehaviour
 
     private void Update()
     {
+        if (movement == null) return;
+
         if (movement.direction == Vector2.up) {
             spriteRenderer.sprite = up;
         }

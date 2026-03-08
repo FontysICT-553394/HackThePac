@@ -45,7 +45,7 @@ public class PacManAI : MonoBehaviour
     private Vector2 _currentDirection = Vector2.zero;
     private Vector2 _queuedDirection = Vector2.zero;
     private Rigidbody2D _rb;
-    private Pacman _pacMan;
+    private PacMan _pacMan;
     private float _decisionTimer;
 
     private static readonly Vector2[] Directions =
@@ -59,7 +59,7 @@ public class PacManAI : MonoBehaviour
     private void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _pacMan = GetComponent<Pacman>();
+        _pacMan = GetComponent<PacMan>();
 
         _blinky = GameObject.Find("blinky(Clone)");
         _pinky = GameObject.Find("pinky(Clone)");

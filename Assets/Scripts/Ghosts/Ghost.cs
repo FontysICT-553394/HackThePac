@@ -8,7 +8,7 @@ public class Ghost : MonoBehaviour
     public GhostHome home { get; private set; }
     public GhostScatter scatter { get; private set; }
     public GhostChase chase { get; private set; }
-    public GhostFrightened frightened { get; private set; }
+    public GhostFrightened frightened { get; set; }
     public GhostBehavior initialBehavior;
     public Transform target;
     public int points = 200;
@@ -30,13 +30,13 @@ public class Ghost : MonoBehaviour
     public void ResetState()
     {
         gameObject.SetActive(true);
-        movement.ResetState();
+        if (movement != null) movement.ResetState();
 
-        frightened.Disable();
-        chase.Disable();
-        scatter.Enable();
+        if (frightened != null) frightened.Disable();
+        if (chase != null) chase.Disable();
+        if (scatter != null) scatter.Enable();
 
-        if (home != initialBehavior)
+        if (home != null && home != initialBehavior)
         {
             home.Disable();
         }
