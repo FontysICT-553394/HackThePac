@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec6f631593a6e454e88d357d4851826f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Movement
-  speed: 7
+  speed: 6
   speedMultiplier: 1
   initialDirection: {x: 0, y: 1}
   obstacleLayer:
@@ -208,6 +208,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8787842015509426814}
   - component: {fileID: 2335401812556866590}
+  - component: {fileID: 1955408256323540019}
   m_Layer: 9
   m_Name: Eyes
   m_TagString: Untagged
@@ -288,6 +289,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1955408256323540019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6098284697234211086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3da5ceca6b3c4d47927396317ffd231, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostEyes
+  up: {fileID: 21300000, guid: f2b2ed6872b01415d9e4094dbf4b43a7, type: 3}
+  down: {fileID: 21300000, guid: 1a8b8baf69c244911b54c5c7cf2c1412, type: 3}
+  left: {fileID: 21300000, guid: a360c03e1bb424309bb1afd01d35a8f9, type: 3}
+  right: {fileID: 21300000, guid: 13b9d58db92b14888b657a34a34c6c91, type: 3}
 --- !u!1 &6493609778868868656
 GameObject:
   m_ObjectHideFlags: 0

@@ -13023,7 +13023,6 @@ MonoBehaviour:
   - {fileID: 542530035}
   inside: {fileID: 41938492}
   outside: {fileID: 613872286}
-  ghostHouseGate: {fileID: 1382138930}
   pelletTilemap: {fileID: 1804535625}
   powerPelletTilemap: {fileID: 1931324778}
   scoreText: {fileID: 1202722679}
