@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
 {
-    public float speed = 8f;
+    public float speed = 3f;
     public float speedMultiplier = 1f;
     public Vector2 initialDirection;
     public LayerMask obstacleLayer;
@@ -47,7 +47,9 @@ public class Movement : MonoBehaviour
     private void FixedUpdate()
     {
         Vector2 position = rb.position;
-        Vector2 translation = speed * speedMultiplier * Time.fixedDeltaTime * direction;
+
+        float finalSpeed = speed + GameSettings.instance.ghostSpeed;
+        Vector2 translation = finalSpeed * speedMultiplier * Time.fixedDeltaTime * direction;
 
         rb.MovePosition(position + translation);
     }

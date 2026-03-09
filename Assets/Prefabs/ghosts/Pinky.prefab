@@ -574,7 +574,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec6f631593a6e454e88d357d4851826f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Movement
-  speed: 6
+  speed: 3
   speedMultiplier: 1
   initialDirection: {x: 0, y: -1}
   obstacleLayer:
