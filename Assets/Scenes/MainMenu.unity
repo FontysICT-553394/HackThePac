@@ -721,7 +721,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AchievementManager
   allAchievements:
-  - {fileID: 11400000, guid: c60ee364897cb671d8bd309625332bb5, type: 2}
+  - {fileID: 11400000, guid: 7eb9a03d95f19bee99638e09f7ee55b5, type: 2}
+  - {fileID: 11400000, guid: e5c74bed5b0c5e167af948f62ce6d73b, type: 2}
+  - {fileID: 11400000, guid: 318a9a64cdb8219bfb6af0d4f6f9dfd5, type: 2}
+  - {fileID: 11400000, guid: 4eb7dfbad9945306ca5e3f4182ebf726, type: 2}
+  - {fileID: 11400000, guid: f46c099f79506b535bf81ea125ca8f97, type: 2}
+  - {fileID: 11400000, guid: 22d5b1afae3b49716bdcbc243d05289d, type: 2}
+  - {fileID: 11400000, guid: d6a9136803a6805b0a2a4f196f770895, type: 2}
 --- !u!1 &245522721
 GameObject:
   m_ObjectHideFlags: 0

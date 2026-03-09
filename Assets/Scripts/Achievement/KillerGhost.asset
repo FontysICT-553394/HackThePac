@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85afc33ce55837cd1ae89d7304fddecd, type: 3}
-  m_Name: PelletsEaten
+  m_Name: KillerGhost
   m_EditorClassIdentifier: Assembly-CSharp::Achievement
-  id: pellets_eaten
-  title: Pellets Eaten
-  description: The amount of pellets you've eaten.
-  icon: {fileID: 6938248684355038417, guid: fc9bd6af448f647ca93fb633f2650d5e, type: 3}
-  targetProgress: 2500
+  id: killer_ghost
+  title: Killer Ghost
+  description: Kill PacMan within 10 seconds of starting the game
+  icon: {fileID: 0}
+  targetProgress: 10

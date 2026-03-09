@@ -29,15 +29,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameWinUI;
     [SerializeField] private GameObject gameLoseUI;
     
-    
     private float _score = 0f;
     
     private GameObject _pacmanInstance;
-    private List<GameObject> _ghostInstances = new List<GameObject>();
+    private List<GameObject> _ghostInstances = new();
     private Tilemap _pelletMap;
     private Tilemap _powerPelletMap;
     private TilemapCollider2D _powerPelletTilemapCollider2D;
     private TilemapCollider2D _pelletTilemapCollider2D;
+    private List<string> _unlockedAchievements = new();
     
     // Colliders
     private BoxCollider2D _pacmanCollider2D;
@@ -54,6 +54,9 @@ public class GameManager : MonoBehaviour
         
         AddPlayerScriptToPlayer();
         AddAiScriptToEnemies();
+        
+        AchievementsUnlocked();
+        StartTimedAchievements();
     }
     
     private void OnEnable()
@@ -181,14 +184,6 @@ public class GameManager : MonoBehaviour
             GhostHouseController.Instance.OnDotEaten();
         }
 
-        if (AchievementManager.Instance == null)
-        {
-            Debug.LogError("AchievementManager.Instance is null!");
-            return;
-        }
-
-        AchievementManager.Instance.AddProgress("pellets_eaten", 1);
-
         if (isPowerPellet)
         {
             //TODO: Add power-up effect
@@ -292,4 +287,28 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
     }
+    
+    private void StartTimedAchievements()
+    {
+        
+    }
+
+    private void AchievementsUnlocked()
+    {
+        AchievementManager achievementManager = AchievementManager.Instance;
+        if (achievementManager == null)
+        {
+            Debug.LogError("AchievementManager instance not found!");
+            return;
+        }
+
+        foreach (var (definition, entry) in achievementManager.GetAllStatus())
+        {
+            if (entry.isCompleted && !_unlockedAchievements.Contains(definition.id))
+                _unlockedAchievements.Add(definition.id);
+        }
+        
+    }
+    
+    
 }
