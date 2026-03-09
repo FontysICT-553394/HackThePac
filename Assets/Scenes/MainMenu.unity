@@ -3227,7 +3227,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: blinky
+          m_StringArgument: Blinky
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &863282647
@@ -3747,7 +3747,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: pinky
+          m_StringArgument: Pinky
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1082970936
@@ -4579,7 +4579,7 @@ Tilemap:
       - {fileID: -1961208853, guid: ff6177acddc8e0c48859afcf73878b71, type: 3}
       - {fileID: 563279180, guid: ff6177acddc8e0c48859afcf73878b71, type: 3}
       - {fileID: 1845676656, guid: ff6177acddc8e0c48859afcf73878b71, type: 3}
-      m_AnimationSpeed: 60
+      m_AnimationSpeed: 60.000004
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -10, y: 6, z: 0}
@@ -5495,7 +5495,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: inky
+          m_StringArgument: Inky
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1745743984
@@ -5629,7 +5629,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: clyde
+          m_StringArgument: Clyde
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1768366026

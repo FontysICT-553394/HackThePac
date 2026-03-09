@@ -16,7 +16,7 @@ public class PacMan : MonoBehaviour
 
     private Tilemap _pelletTilemapComponent;
     private Tilemap _powerPelletTilemapComponent;
-    private List<BoxCollider2D> ghostColliders = new List<BoxCollider2D>();
+    private List<CircleCollider2D> ghostColliders = new();
 
     private bool _isDead = false;
     private readonly float minMovementForRotation = 0.01f;
@@ -35,18 +35,17 @@ public class PacMan : MonoBehaviour
         _pelletTilemapCollider2D = _pelletTilemap.GetComponent<TilemapCollider2D>();
         _powerPelletTilemapCollider2D = _powerPelletTilemap.GetComponent<TilemapCollider2D>();
         
-        ghostColliders.Add(GameObject.Find("blinky(Clone)").TryGetComponent<BoxCollider2D>(out var blinkyCollider) ? blinkyCollider : null);
-        //TODO: Enable when ghost prefabs are fixed to have colliders
-        // ghostColliders.Add(GameObject.Find("pinky(Clone)").TryGetComponent<BoxCollider2D>(out var pinkyCollider) ? pinkyCollider : null);
-        // ghostColliders.Add(GameObject.Find("inky(Clone)").TryGetComponent<BoxCollider2D>(out var inkyCollider) ? inkyCollider : null);
-        // ghostColliders.Add(GameObject.Find("clyde(Clone)").TryGetComponent<BoxCollider2D>(out var clydeCollider) ? clydeCollider : null);
+        ghostColliders.Add(GameObject.Find("Blinky(Clone)").TryGetComponent<CircleCollider2D>(out var blinkyCollider) ? blinkyCollider : null);
+        ghostColliders.Add(GameObject.Find("Pinky(Clone)").TryGetComponent<CircleCollider2D>(out var pinkyCollider) ? pinkyCollider : null);
+        ghostColliders.Add(GameObject.Find("Inky(Clone)").TryGetComponent<CircleCollider2D>(out var inkyCollider) ? inkyCollider : null);
+        ghostColliders.Add(GameObject.Find("Clyde(Clone)").TryGetComponent<CircleCollider2D>(out var clydeCollider) ? clydeCollider : null);
     }
 
     private void Update()
     {
         if (_pelletTilemapCollider2D.IsTouching(_pacmanCollider2D))
             EatPellet();
-        
+
         if (_powerPelletTilemapCollider2D.IsTouching(_pacmanCollider2D))
             EatPowerPellet();
 
@@ -54,11 +53,36 @@ public class PacMan : MonoBehaviour
         {
             foreach (var ghostCollider in ghostColliders)
             {
+                if (ghostCollider == null) continue;
+
                 if (_pacmanCollider2D.IsTouching(ghostCollider) && !_isDead)
+                {
+                    GhostFrightened frightened = ghostCollider.GetComponent<GhostFrightened>();
+                    if (frightened != null && frightened.enabled)
+                        continue;
+
                     OnCollisionWithGhost();
+                }
             }
         }
-        
+        else
+        {
+            foreach (var ghostCollider in ghostColliders)
+            {
+                if (ghostCollider == null) continue;
+
+                if (_pacmanCollider2D.IsTouching(ghostCollider))
+                {
+                    Ghost ghost = ghostCollider.GetComponent<Ghost>();
+                    if (ghost != null && ghost.frightened.enabled && !ghost.frightened.eaten)
+                    {
+                        _gameManager.GhostEaten(ghost);
+                        ghost.frightened.Eaten();
+                    }
+                }
+            }
+        }
+
         RotateToMovementDirection();
         _previousPosition = transform.position;
     }
@@ -97,8 +121,9 @@ public class PacMan : MonoBehaviour
 
     private void OnCollisionWithGhost()
     {
-        GhostHouseController.Instance.OnLifeLost();
+        // GhostHouseController.Instance.OnLifeLost();
         _isDead = true;
         _gameManager.PacManDied();
     }
+    
 }

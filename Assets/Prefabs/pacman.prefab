@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1360158102814589581}
   - component: {fileID: 2427629258204148515}
   - component: {fileID: 1153936548267488623}
-  - component: {fileID: 6279040889155693017}
+  - component: {fileID: 1612698232655323835}
   m_Layer: 8
   m_Name: pacman
   m_TagString: Untagged
@@ -189,7 +189,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.2876177, y: 1.1440066}
   m_EdgeRadius: 0
---- !u!114 &6279040889155693017
+--- !u!114 &1612698232655323835
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,6 +202,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PacMan
   isPoweredUp: 0
-  smoothRotation: 1
-  rotationSpeed: 720
-  minMovementForRotation: 0.01

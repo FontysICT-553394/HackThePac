@@ -1,34 +1,22 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Collider2D))]
 public class Pellet : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private int scoreValue = 10;
-    [SerializeField] private string pacmanTag = "Player";
+    public int points = 10;
 
-    private bool eaten;
-
-    private void Reset()
+    protected virtual void Eat()
     {
-        // Zorg dat je pellet collider een trigger is
-        var col = GetComponent<Collider2D>();
-        col.isTrigger = true;
+        // GameManager.Instance.PelletEaten(this);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (eaten) return;
-        if (!other.CompareTag(pacmanTag)) return;
-
-        eaten = true;
-
-        // 1) notify ghost release system
-        if (GhostHouseController.Instance != null)
-            GhostHouseController.Instance.OnDotEaten();
-
-        // 3) destroy pellet
-        Destroy(gameObject);
+        if (other.gameObject.layer == LayerMask.NameToLayer("Pacman"))
+        {
+            Eat();
+        }
     }
+
 }
+
