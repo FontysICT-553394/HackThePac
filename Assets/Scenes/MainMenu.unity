@@ -814,7 +814,7 @@ MonoBehaviour:
   m_MinValue: 1
   m_MaxValue: 5
   m_WholeNumbers: 1
-  m_Value: 1
+  m_Value: 2
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -4675,7 +4675,7 @@ Tilemap:
       - {fileID: -1961208853, guid: ff6177acddc8e0c48859afcf73878b71, type: 3}
       - {fileID: 563279180, guid: ff6177acddc8e0c48859afcf73878b71, type: 3}
       - {fileID: 1845676656, guid: ff6177acddc8e0c48859afcf73878b71, type: 3}
-      m_AnimationSpeed: 60.000004
+      m_AnimationSpeed: 60
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -10, y: 6, z: 0}
@@ -5122,7 +5122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameSettings
   pacmanSpeed: 3
-  ghostSpeed: 3
+  ghostSpeed: 2
   selectedCharacter: 
 --- !u!4 &1655190833
 Transform:
