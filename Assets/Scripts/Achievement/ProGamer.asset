@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85afc33ce55837cd1ae89d7304fddecd, type: 3}
+  m_Name: ProGamer
+  m_EditorClassIdentifier: Assembly-CSharp::Achievement
+  id: pro_gamer
+  title: Pro Gamer
+  description: Beat 10 consecutive games as PacMan, without dying.
+  icon: {fileID: -6116695336936236789, guid: 2d81ec31e8a644e5d92fbb9c8163b51b, type: 3}
+  targetProgress: 10

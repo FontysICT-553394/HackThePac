@@ -14,7 +14,7 @@ public class PacManAI : MonoBehaviour
     [Header("AI Tuning")] 
     // How close a ghost must be (in units) before PacMan reacts to it.
     // Increase to make PacMan react to ghosts from further away; decrease to make it braver.
-    [SerializeField] private float ghostDangerRadius = 3f; 
+    [SerializeField] private float ghostDangerRadius = 6f; 
     
     // How strongly PacMan avoids (or chases when powered up) ghosts within danger radius.
     // Higher values = more aggressive avoidance/chasing; lower values = ghost proximity matters less.
@@ -130,7 +130,7 @@ public class PacManAI : MonoBehaviour
             score += pelletRewardWeight / nearestPelletDist;
 
         // Ghost avoidance/chasing: apply a penalty or bonus based on ghost proximity.
-        bool isPoweredUp = _pacMan != null && _pacMan.isPoweredUp;
+        //bool isPoweredUp = _pacMan != null && _pacMan.isPoweredUp;
         foreach (var ghost in _ghosts)
         {
             if (ghost == null) continue;
@@ -138,17 +138,17 @@ public class PacManAI : MonoBehaviour
 
             if (dist < ghostDangerRadius)
             {
-                if (isPoweredUp)
-                {
-                    // When powered up, chase ghosts: higher score for directions closer to a ghost.
-                    score += ghostPenaltyWeight / Mathf.Max(dist, 0.1f);
-                }
-                else
-                {
-                    // When not powered up, flee: penalize directions that lead closer to a ghost.
-                    // Mathf.Max prevents division by zero if PacMan overlaps with a ghost.
-                    score -= ghostPenaltyWeight / Mathf.Max(dist, 0.1f);
-                }
+                //if (isPoweredUp)
+                //{
+                //    // When powered up, chase ghosts: higher score for directions closer to a ghost.
+                //    score += ghostPenaltyWeight / Mathf.Max(dist, 0.1f);
+                //}
+                //else
+                //{
+                //    // When not powered up, flee: penalize directions that lead closer to a ghost.
+                //    // Mathf.Max prevents division by zero if PacMan overlaps with a ghost.
+                //    score -= ghostPenaltyWeight / Mathf.Max(dist, 0.1f);
+                //}
             }
         }
 

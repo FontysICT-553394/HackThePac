@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        wallLayer = LayerMask.GetMask("Walls");
+        wallLayer = LayerMask.GetMask("Obstacle");
     }
 
     private void Update()
