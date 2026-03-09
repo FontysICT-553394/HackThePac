@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
     private float _score = 0f;
     private int lives = 3;
     private int ghostMultiplier = 1;
+    private HashSet<string> _unlockedAchievements = new HashSet<string>();
 
     private GameObject pacmanInstance;
     private List<GameObject> ghostInstances = new List<GameObject>();
