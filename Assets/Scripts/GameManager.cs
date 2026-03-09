@@ -416,4 +416,28 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
     }
+    
+    private void StartTimedAchievements()
+    {
+        
+    }
+
+    private void AchievementsUnlocked()
+    {
+        AchievementManager achievementManager = AchievementManager.Instance;
+        if (achievementManager == null)
+        {
+            Debug.LogError("AchievementManager instance not found!");
+            return;
+        }
+
+        foreach (var (definition, entry) in achievementManager.GetAllStatus())
+        {
+            if (entry.isCompleted && !_unlockedAchievements.Contains(definition.id))
+                _unlockedAchievements.Add(definition.id);
+        }
+        
+    }
+    
+    
 }

@@ -20,8 +20,8 @@ public class MainMenuManager : MonoBehaviour
     {
         GameSettings.instance.selectedCharacter = character;
         // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        SceneManager.LoadScene("Game - Ryan");
-        // SceneManager.LoadScene("Game - Beau");
+        // SceneManager.LoadScene("Game - Ryan");
+        SceneManager.LoadScene("Game - Beau");
 
     }
     
