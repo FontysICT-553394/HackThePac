@@ -14,6 +14,7 @@ public class Pellet : MonoBehaviour
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Pacman"))
         {
+            AudioManager.Instance.PlayPellet();
             Eat();
         }
     }

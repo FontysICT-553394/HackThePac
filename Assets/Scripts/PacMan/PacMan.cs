@@ -121,6 +121,7 @@ public class PacMan : MonoBehaviour
 
     private void OnCollisionWithGhost()
     {
+        AudioManager.Instance.PlayDeath();
         // GhostHouseController.Instance.OnLifeLost();
         _isDead = true;
         _gameManager.PacManDied();
