@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -51,6 +52,12 @@ public class GameManager : MonoBehaviour
 
     // Colliders
     private BoxCollider2D pacmanCollider2D;
+    
+    private Coroutine freezeAchievementCoroutine = null;
+    private Coroutine killerGhostAchievementCoroutine = null;
+    private Coroutine speedrunAchievementCoroutine = null;
+    private int speedrunCountdown = 90;
+    private int killerGhostCountdown = 10;
 
     private void Awake()
     {
@@ -102,6 +109,9 @@ public class GameManager : MonoBehaviour
         AddAiScriptToEnemies();
 
         NewGame();
+        
+        AchievementsUnlocked();
+        StartTimedAchievements();
     }
 
     private void Update()
@@ -114,6 +124,9 @@ public class GameManager : MonoBehaviour
         {
             NewGame();
         }
+
+        if (!Mathf.Approximately(pacmanInstance.transform.position.x, pacmanSpawnPoint.transform.position.x) || !Mathf.Approximately(pacmanInstance.transform.position.y, pacmanSpawnPoint.transform.position.y))
+            StopCoroutine(freezeAchievementCoroutine);
     }
 
     private void NewGame()
@@ -345,15 +358,31 @@ public class GameManager : MonoBehaviour
     public void PacManDied()
     {
         if (GameSettings.instance.selectedCharacter == "pacman")
+        {
             ShowLose();
+            AchievementManager.Instance.SetProgress("pro_gamer", 0);
+        }
         else
+        {
             ShowWin();
+            
+            StopCoroutine(killerGhostAchievementCoroutine);
+            if (killerGhostCountdown > 0)
+                AchievementManager.Instance.SetProgress("killer_ghost", 1);
+        }
     }
 
     private void AllPelletsEaten()
     {
         if (GameSettings.instance.selectedCharacter == "pacman")
+        {
             ShowWin();
+            AchievementManager.Instance.AddProgress("pro_gamer");
+            
+            StopCoroutine(speedrunAchievementCoroutine);
+            if (speedrunCountdown > 0)
+                AchievementManager.Instance.SetProgress("speedrun", 1);
+        }
         else
             ShowLose();
     }
@@ -420,7 +449,36 @@ public class GameManager : MonoBehaviour
     
     private void StartTimedAchievements()
     {
+        int freezeAchievementDuration = AchievementManager.Instance.GetAchievementById("freeze").targetProgress;
+        int killerGhostAchievementDuration = AchievementManager.Instance.GetAchievementById("killer_ghost").targetProgress;
+        int speedrunAchievementDuration = AchievementManager.Instance.GetAchievementById("speedrun").targetProgress;
         
+        if (!_unlockedAchievements.Contains("freeze"))
+        {
+            AchievementManager.Instance.SetProgress("freeze", 0);
+            freezeAchievementCoroutine = StartCoroutine(StartTimer(freezeAchievementDuration, () =>
+            {
+                AchievementManager.Instance.AddProgress("freeze");
+            }));
+        }
+        
+        if (!_unlockedAchievements.Contains("killer_ghost"))
+        {
+            AchievementManager.Instance.SetProgress("killer_ghost", 0);
+            killerGhostAchievementCoroutine = StartCoroutine(StartTimer(killerGhostAchievementDuration, () =>
+            {
+                killerGhostCountdown--;
+            }));
+        }
+        
+        if (!_unlockedAchievements.Contains("speedrun"))
+        {
+            AchievementManager.Instance.SetProgress("speedrun", 0);
+            speedrunAchievementCoroutine = StartCoroutine(StartTimer(speedrunAchievementDuration, () =>
+            {
+                speedrunCountdown--;
+            }));
+        }
     }
 
     private void AchievementsUnlocked()
@@ -440,5 +498,15 @@ public class GameManager : MonoBehaviour
         
     }
     
+    private IEnumerator StartTimer(int duration, Action onComplete)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            yield return new WaitForSeconds(1f);
+            onComplete?.Invoke();
+            elapsed += 1f;
+        }
+    }
     
 }

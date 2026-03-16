@@ -16,4 +16,4 @@ MonoBehaviour:
   title: Killer Ghost
   description: Kill PacMan within 10 seconds of starting the game
   icon: {fileID: 0}
-  targetProgress: 10
+  targetProgress: 1
