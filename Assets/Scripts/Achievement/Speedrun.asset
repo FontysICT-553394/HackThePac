@@ -16,4 +16,4 @@ MonoBehaviour:
   title: Speedrun
   description: Beat the game within 90 seconds as PacMan
   icon: {fileID: 0}
-  targetProgress: 1
+  targetProgress: 90

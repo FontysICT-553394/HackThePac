@@ -52,12 +52,15 @@ public class GameManager : MonoBehaviour
 
     // Colliders
     private BoxCollider2D pacmanCollider2D;
-    
+
+    private bool gameEnded = false;
     private Coroutine freezeAchievementCoroutine = null;
     private Coroutine killerGhostAchievementCoroutine = null;
     private Coroutine speedrunAchievementCoroutine = null;
+    private Coroutine fearMeAchievementCoroutine = null;
     private int speedrunCountdown = 90;
     private int killerGhostCountdown = 10;
+    private int fearMeCountdown = 3;
 
     private void Awake()
     {
@@ -126,11 +129,16 @@ public class GameManager : MonoBehaviour
         }
 
         if (!Mathf.Approximately(pacmanInstance.transform.position.x, pacmanSpawnPoint.transform.position.x) || !Mathf.Approximately(pacmanInstance.transform.position.y, pacmanSpawnPoint.transform.position.y))
-            StopCoroutine(freezeAchievementCoroutine);
+            if (freezeAchievementCoroutine != null)
+            {
+                StopCoroutine(freezeAchievementCoroutine);
+                freezeAchievementCoroutine = null;
+            }
     }
 
     private void NewGame()
     {
+        gameEnded = false;
         SetScore(0);
         SetLives(3);
         NewRound();
@@ -353,6 +361,23 @@ public class GameManager : MonoBehaviour
         PacMan pacManScript = pacmanInstance.GetComponent<PacMan>();
         if (pacManScript != null)
             pacManScript.isPoweredUp = false;
+        
+        if (!_unlockedAchievements.Contains("fear_me"))
+        {
+            int fearMeAchievementDuration = AchievementManager.Instance.GetAchievementById("fear_me").targetProgress;
+            
+            if (fearMeAchievementCoroutine != null)
+            {
+                StopCoroutine(fearMeAchievementCoroutine);
+                fearMeAchievementCoroutine = null;
+            }
+            
+            fearMeCountdown = fearMeAchievementDuration;
+            StartCoroutine(StartTimer(fearMeAchievementDuration, () =>
+            {
+                fearMeCountdown--;
+            }));
+        }
     }
 
     public void PacManDied()
@@ -366,25 +391,47 @@ public class GameManager : MonoBehaviour
         {
             ShowWin();
             
-            StopCoroutine(killerGhostAchievementCoroutine);
+            if (killerGhostAchievementCoroutine != null)
+            {
+                StopCoroutine(killerGhostAchievementCoroutine);
+                killerGhostAchievementCoroutine = null;
+            }
             if (killerGhostCountdown > 0)
-                AchievementManager.Instance.SetProgress("killer_ghost", 1);
+                AchievementManager.Instance.SetProgress("killer_ghost", 10);
+            
+            if (fearMeAchievementCoroutine != null)
+            {
+                StopCoroutine(fearMeAchievementCoroutine);
+                fearMeAchievementCoroutine = null;
+            }
+            if (fearMeCountdown > 0)
+                AchievementManager.Instance.SetProgress("fear_me", 3);
         }
     }
 
     private void AllPelletsEaten()
     {
+        if (gameEnded) return;
+        gameEnded = true;
+
         if (GameSettings.instance.selectedCharacter == "pacman")
         {
             ShowWin();
+
             AchievementManager.Instance.AddProgress("pro_gamer");
-            
-            StopCoroutine(speedrunAchievementCoroutine);
+
+            if (speedrunAchievementCoroutine != null)
+            {
+                StopCoroutine(speedrunAchievementCoroutine);
+                speedrunAchievementCoroutine = null;
+            }
             if (speedrunCountdown > 0)
-                AchievementManager.Instance.SetProgress("speedrun", 1);
+                AchievementManager.Instance.SetProgress("speedrun", 90);
         }
         else
+        {
             ShowLose();
+        }
     }
 
     private void ShowWin()
@@ -399,6 +446,7 @@ public class GameManager : MonoBehaviour
             highScoreTextWin.text = "Score: " + (2620f - _score);
 
         Time.timeScale = 0;
+        gameEnded = true;
     }
 
     private void ShowLose()
@@ -413,6 +461,7 @@ public class GameManager : MonoBehaviour
             highScoreTextLose.text = "Score: " + (2620f - _score);
 
         Time.timeScale = 0;
+        gameEnded = true;
     }
 
     private bool HasRemainingPellets()

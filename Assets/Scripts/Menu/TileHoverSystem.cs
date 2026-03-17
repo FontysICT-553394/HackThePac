@@ -33,8 +33,18 @@ public class TileHoverSystem : MonoBehaviour
 
             textMesh.gameObject.SetActive(true);
             textMesh.transform.position = pos + Vector3.up * 1.8f;
-            textMesh.text = infoTile.achievement.description + "\n " + AchievementManager.Instance.GetProgress(infoTile.achievement.id) + "/" + infoTile.achievement.targetProgress;
-        }
+
+            var achievement = infoTile.achievement;
+            if (achievement != null)
+            {
+                var progress = AchievementManager.Instance != null ? AchievementManager.Instance.GetProgress(achievement.id) : null;
+                string progressText = progress != null ? $"{progress.currentProgress}/{achievement.targetProgress}" : $"0/{achievement.targetProgress}";
+                textMesh.text = achievement.description + "\n " + progressText;
+            }
+            else
+            {
+                textMesh.text = string.Empty;
+            }        }
         else
         {
             textMesh.gameObject.SetActive(false);
