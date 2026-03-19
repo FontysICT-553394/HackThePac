@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     [SerializeField] private GameObject pelletTilemap;
     [SerializeField] private GameObject powerPelletTilemap;
+    [SerializeField] private GameObject hackTilemap;
 
     [Header("Game UI")]
     [SerializeField] private TMP_Text scoreText;
@@ -47,11 +48,7 @@ public class GameManager : MonoBehaviour
     private List<GameObject> ghostInstances = new List<GameObject>();
     private Tilemap pelletMap;
     private Tilemap powerPelletMap;
-    private TilemapCollider2D powerPelletTilemapCollider2D;
-    private TilemapCollider2D pelletTilemapCollider2D;
-
-    // Colliders
-    private BoxCollider2D pacmanCollider2D;
+    private Tilemap hackMap;
 
     private bool gameEnded = false;
     private Coroutine freezeAchievementCoroutine = null;
@@ -62,6 +59,10 @@ public class GameManager : MonoBehaviour
     private int killerGhostCountdown = 10;
     private int fearMeCountdown = 3;
 
+    // per-cell cooldown for hack toggles (seconds)
+    private float hackToggleCooldown = 1f;
+    private Dictionary<Vector3Int, float> hackLastToggleTime = new Dictionary<Vector3Int, float>();
+    
     private void Awake()
     {
         if (Instance != null)
@@ -100,10 +101,9 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
-        pelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
-        powerPelletTilemapCollider2D = powerPelletTilemap.GetComponent<TilemapCollider2D>();
         pelletMap = pelletTilemap.GetComponent<Tilemap>();
         powerPelletMap = powerPelletTilemap.GetComponent<Tilemap>();
+        hackMap = hackTilemap.GetComponent<Tilemap>();
 
         InstantiatePacman();
         InstantiateGhosts();
@@ -134,6 +134,13 @@ public class GameManager : MonoBehaviour
                 StopCoroutine(freezeAchievementCoroutine);
                 freezeAchievementCoroutine = null;
             }
+    }
+
+    private void FixedUpdate()
+    {
+        string hackName = CheckHackTilemapCollision();
+        if (hackName != null)
+            SwapHackState(hackName);
     }
 
     private void NewGame()
@@ -221,7 +228,6 @@ public class GameManager : MonoBehaviour
             Destroy(pacmanInstance);
 
         pacmanInstance = Instantiate(pacmanPrefab, pacmanSpawnPoint.position, Quaternion.identity);
-        pacmanCollider2D = pacmanInstance.GetComponent<BoxCollider2D>();
     }
 
     private void InstantiateGhosts()
@@ -555,6 +561,84 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
             onComplete?.Invoke();
             elapsed += 1f;
+        }
+    }
+
+    // Assets/Scripts/GameManager.cs (replace the toggle part inside CheckHackTilemapCollision)
+    private string CheckHackTilemapCollision()
+    {
+        if (pacmanInstance == null || hackMap == null) return null;
+
+        Vector3 worldPos = pacmanInstance.transform.position;
+        Vector3Int centerCell = hackMap.WorldToCell(worldPos);
+
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                Vector3Int cellPos = new Vector3Int(centerCell.x + dx, centerCell.y + dy, centerCell.z);
+                TileBase tile = hackMap.GetTile(cellPos);
+                if (tile == null) continue;
+
+                if (tile is not InfoTile infoTile) continue;
+
+                // If locked, ignore interaction.
+                if (infoTile.isHackLocked) continue;
+
+                float lastTime = 0f;
+                hackLastToggleTime.TryGetValue(cellPos, out lastTime);
+                if (Time.time - lastTime < hackToggleCooldown) continue;
+
+                // Toggle state on the tile instance, then refresh visuals for that cell.
+                infoTile.isHackEnabled = !infoTile.isHackEnabled;
+                hackMap.RefreshTile(cellPos);
+
+                hackLastToggleTime[cellPos] = Time.time;
+                return infoTile.hackName;
+            }
+        }
+
+        return null;
+    }
+
+    private void SwapHackState(string hackName)
+    {
+        switch (hackName)
+        {
+            //PacMan
+            case "freeze":
+                GameSettings.instance.freezeEnabled = !GameSettings.instance.freezeEnabled;
+                break;
+            
+            case "clone":
+                GameSettings.instance.cloneEnabled = !GameSettings.instance.cloneEnabled;
+                break;
+            
+            case "speed_overflow":
+                GameSettings.instance.speedOverflowEnabled = !GameSettings.instance.speedOverflowEnabled;
+                break;
+            
+            //ghosts
+            case "vision_hack":
+                GameSettings.instance.visionHackEnabled = !GameSettings.instance.visionHackEnabled;
+                break;
+            
+            case "wall_phase":
+                GameSettings.instance.wallPhaseEnabled = !GameSettings.instance.wallPhaseEnabled;
+                break;
+            
+            case "fear_override":
+                GameSettings.instance.fearOverrideEnabled = !GameSettings.instance.fearOverrideEnabled;
+                break;
+            
+            //general
+            case "debug_mode":
+                GameSettings.instance.debugModeEnabled = !GameSettings.instance.debugModeEnabled;
+                break;
+            
+            case "no_clip":
+                GameSettings.instance.noClipEnabled = !GameSettings.instance.noClipEnabled;
+                break;
         }
     }
     

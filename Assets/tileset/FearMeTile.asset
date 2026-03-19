@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f612433a88688c09d0ddad069733f4, type: 3}
   m_Name: FearMeTile
   m_EditorClassIdentifier: Assembly-CSharp::InfoTile
-  m_Sprite: {fileID: -256182486513637855, guid: c786391c929f740d9887c5f752799969, type: 3}
+  m_Sprite: {fileID: -2127006833, guid: 14bf263d1b83f093db5875a0a6a07831, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -34,5 +34,8 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
-  hoverText: 
   achievement: {fileID: 11400000, guid: 7eb9a03d95f19bee99638e09f7ee55b5, type: 2}
+  hackName: fear_override
+  hackLockedSprite: {fileID: -2127006833, guid: 14bf263d1b83f093db5875a0a6a07831, type: 3}
+  hackDisabledSprite: {fileID: -256182486513637855, guid: c786391c929f740d9887c5f752799969, type: 3}
+  hackEnabledSprite: {fileID: -862809864, guid: a035de8c0a6b06d24a82a82509bf1769, type: 3}
