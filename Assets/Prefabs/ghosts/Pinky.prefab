@@ -473,6 +473,8 @@ GameObject:
   - component: {fileID: 4487429572650992938}
   - component: {fileID: 51244195970604438}
   - component: {fileID: 3730363920493398053}
+  - component: {fileID: -5248319220155575655}
+  - component: {fileID: -8188767786254006685}
   m_Layer: 9
   m_Name: Pinky
   m_TagString: Untagged
@@ -574,7 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec6f631593a6e454e88d357d4851826f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Movement
-  speed: 6
+  speed: 3
   speedMultiplier: 1
   initialDirection: {x: 0, y: -1}
   obstacleLayer:
@@ -654,3 +656,33 @@ MonoBehaviour:
   blue: {fileID: 1228933959266884445}
   white: {fileID: 4270707856516932711}
   eaten: 0
+--- !u!114 &-5248319220155575655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8813580522812543888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d15f26612ca43a1bfae95b049419505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostEatenBehavior
+  duration: 0
+--- !u!114 &-8188767786254006685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8813580522812543888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4187e53fd2ca4b72af80e9982ffef19a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostAISelector
+  aiType: 1
+  pinkyTilesAhead: 4
+  inkyTilesAhead: 2
+  clydeChaseDistance: 8
+  clydeScatterCorner: {x: -100, y: -100}

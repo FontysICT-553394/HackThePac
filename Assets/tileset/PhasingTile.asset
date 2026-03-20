@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05f612433a88688c09d0ddad069733f4, type: 3}
+  m_Name: PhasingTile
+  m_EditorClassIdentifier: Assembly-CSharp::InfoTile
+  m_Sprite: {fileID: -256182486513637855, guid: c786391c929f740d9887c5f752799969, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Transform:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
+  m_InstancedGameObject: {fileID: 0}
+  m_Flags: 1
+  m_ColliderType: 1
+  achievement: {fileID: 11400000, guid: 4eb7dfbad9945306ca5e3f4182ebf726, type: 2}
+  hackName: 
+  hackLockedSprite: {fileID: -2127006833, guid: 14bf263d1b83f093db5875a0a6a07831, type: 3}
+  hackDisabledSprite: {fileID: -256182486513637855, guid: c786391c929f740d9887c5f752799969, type: 3}
+  hackEnabledSprite: {fileID: -862809864, guid: a035de8c0a6b06d24a82a82509bf1769, type: 3}

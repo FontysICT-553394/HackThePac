@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     [SerializeField] private GameObject pelletTilemap;
     [SerializeField] private GameObject powerPelletTilemap;
+    [SerializeField] private GameObject hackTilemap;
 
     [Header("Game UI")]
     [SerializeField] private TMP_Text scoreText;
@@ -46,12 +48,21 @@ public class GameManager : MonoBehaviour
     private List<GameObject> ghostInstances = new List<GameObject>();
     private Tilemap pelletMap;
     private Tilemap powerPelletMap;
-    private TilemapCollider2D powerPelletTilemapCollider2D;
-    private TilemapCollider2D pelletTilemapCollider2D;
+    private Tilemap hackMap;
 
-    // Colliders
-    private BoxCollider2D pacmanCollider2D;
+    private bool gameEnded = false;
+    private Coroutine freezeAchievementCoroutine = null;
+    private Coroutine killerGhostAchievementCoroutine = null;
+    private Coroutine speedrunAchievementCoroutine = null;
+    private Coroutine fearMeAchievementCoroutine = null;
+    private int speedrunCountdown = 90;
+    private int killerGhostCountdown = 10;
+    private int fearMeCountdown = 3;
 
+    // per-cell cooldown for hack toggles (seconds)
+    private float hackToggleCooldown = 1f;
+    private Dictionary<Vector3Int, float> hackLastToggleTime = new Dictionary<Vector3Int, float>();
+    
     private void Awake()
     {
         if (Instance != null)
@@ -90,10 +101,10 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
-        pelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
-        powerPelletTilemapCollider2D = powerPelletTilemap.GetComponent<TilemapCollider2D>();
+        AudioManager.Instance.PlayIntro();
         pelletMap = pelletTilemap.GetComponent<Tilemap>();
         powerPelletMap = powerPelletTilemap.GetComponent<Tilemap>();
+        hackMap = hackTilemap.GetComponent<Tilemap>();
 
         InstantiatePacman();
         InstantiateGhosts();
@@ -102,6 +113,9 @@ public class GameManager : MonoBehaviour
         AddAiScriptToEnemies();
 
         NewGame();
+        
+        AchievementsUnlocked();
+        StartTimedAchievements();
     }
 
     private void Update()
@@ -114,10 +128,25 @@ public class GameManager : MonoBehaviour
         {
             NewGame();
         }
+
+        if (!Mathf.Approximately(pacmanInstance.transform.position.x, pacmanSpawnPoint.transform.position.x) || !Mathf.Approximately(pacmanInstance.transform.position.y, pacmanSpawnPoint.transform.position.y))
+            if (freezeAchievementCoroutine != null)
+            {
+                StopCoroutine(freezeAchievementCoroutine);
+                freezeAchievementCoroutine = null;
+            }
+    }
+
+    private void FixedUpdate()
+    {
+        string hackName = CheckHackTilemapCollision();
+        if (hackName != null)
+            SwapHackState(hackName);
     }
 
     private void NewGame()
     {
+        gameEnded = false;
         SetScore(0);
         SetLives(3);
         NewRound();
@@ -200,7 +229,6 @@ public class GameManager : MonoBehaviour
             Destroy(pacmanInstance);
 
         pacmanInstance = Instantiate(pacmanPrefab, pacmanSpawnPoint.position, Quaternion.identity);
-        pacmanCollider2D = pacmanInstance.GetComponent<BoxCollider2D>();
     }
 
     private void InstantiateGhosts()
@@ -291,6 +319,7 @@ public class GameManager : MonoBehaviour
 
     public void GhostEaten(Ghost ghost)
     {
+        AudioManager.Instance.PlayGhostEaten();
         int points = ghost.points * ghostMultiplier;
         AddScore(points);
         ghostMultiplier++;
@@ -303,11 +332,13 @@ public class GameManager : MonoBehaviour
     {
         if (tilemap.HasTile(cellPos))
         {
+            AudioManager.Instance.PlayPellet();
             tilemap.SetTile(cellPos, null);
         }
 
         if (isPowerPellet)
         {
+            AudioManager.Instance.PlayPowerPellet();
             PowerPelletEatenEffect();
         }
     }
@@ -340,22 +371,77 @@ public class GameManager : MonoBehaviour
         PacMan pacManScript = pacmanInstance.GetComponent<PacMan>();
         if (pacManScript != null)
             pacManScript.isPoweredUp = false;
+        
+        if (!_unlockedAchievements.Contains("fear_me"))
+        {
+            int fearMeAchievementDuration = AchievementManager.Instance.GetAchievementById("fear_me").targetProgress;
+            
+            if (fearMeAchievementCoroutine != null)
+            {
+                StopCoroutine(fearMeAchievementCoroutine);
+                fearMeAchievementCoroutine = null;
+            }
+            
+            fearMeCountdown = fearMeAchievementDuration;
+            StartCoroutine(StartTimer(fearMeAchievementDuration, () =>
+            {
+                fearMeCountdown--;
+            }));
+        }
     }
 
     public void PacManDied()
     {
         if (GameSettings.instance.selectedCharacter == "pacman")
+        {
             ShowLose();
+            AchievementManager.Instance.SetProgress("pro_gamer", 0);
+        }
         else
+        {
             ShowWin();
+            
+            if (killerGhostAchievementCoroutine != null)
+            {
+                StopCoroutine(killerGhostAchievementCoroutine);
+                killerGhostAchievementCoroutine = null;
+            }
+            if (killerGhostCountdown > 0)
+                AchievementManager.Instance.SetProgress("killer_ghost", 10);
+            
+            if (fearMeAchievementCoroutine != null)
+            {
+                StopCoroutine(fearMeAchievementCoroutine);
+                fearMeAchievementCoroutine = null;
+            }
+            if (fearMeCountdown > 0)
+                AchievementManager.Instance.SetProgress("fear_me", 3);
+        }
     }
 
     private void AllPelletsEaten()
     {
+        if (gameEnded) return;
+        gameEnded = true;
+
         if (GameSettings.instance.selectedCharacter == "pacman")
+        {
             ShowWin();
+
+            AchievementManager.Instance.AddProgress("pro_gamer");
+
+            if (speedrunAchievementCoroutine != null)
+            {
+                StopCoroutine(speedrunAchievementCoroutine);
+                speedrunAchievementCoroutine = null;
+            }
+            if (speedrunCountdown > 0)
+                AchievementManager.Instance.SetProgress("speedrun", 90);
+        }
         else
+        {
             ShowLose();
+        }
     }
 
     private void ShowWin()
@@ -370,6 +456,7 @@ public class GameManager : MonoBehaviour
             highScoreTextWin.text = "Score: " + (2620f - _score);
 
         Time.timeScale = 0;
+        gameEnded = true;
     }
 
     private void ShowLose()
@@ -384,6 +471,7 @@ public class GameManager : MonoBehaviour
             highScoreTextLose.text = "Score: " + (2620f - _score);
 
         Time.timeScale = 0;
+        gameEnded = true;
     }
 
     private bool HasRemainingPellets()
@@ -420,7 +508,36 @@ public class GameManager : MonoBehaviour
     
     private void StartTimedAchievements()
     {
+        int freezeAchievementDuration = AchievementManager.Instance.GetAchievementById("freeze").targetProgress;
+        int killerGhostAchievementDuration = AchievementManager.Instance.GetAchievementById("killer_ghost").targetProgress;
+        int speedrunAchievementDuration = AchievementManager.Instance.GetAchievementById("speedrun").targetProgress;
         
+        if (!_unlockedAchievements.Contains("freeze"))
+        {
+            AchievementManager.Instance.SetProgress("freeze", 0);
+            freezeAchievementCoroutine = StartCoroutine(StartTimer(freezeAchievementDuration, () =>
+            {
+                AchievementManager.Instance.AddProgress("freeze");
+            }));
+        }
+        
+        if (!_unlockedAchievements.Contains("killer_ghost"))
+        {
+            AchievementManager.Instance.SetProgress("killer_ghost", 0);
+            killerGhostAchievementCoroutine = StartCoroutine(StartTimer(killerGhostAchievementDuration, () =>
+            {
+                killerGhostCountdown--;
+            }));
+        }
+        
+        if (!_unlockedAchievements.Contains("speedrun"))
+        {
+            AchievementManager.Instance.SetProgress("speedrun", 0);
+            speedrunAchievementCoroutine = StartCoroutine(StartTimer(speedrunAchievementDuration, () =>
+            {
+                speedrunCountdown--;
+            }));
+        }
     }
 
     private void AchievementsUnlocked()
@@ -440,5 +557,93 @@ public class GameManager : MonoBehaviour
         
     }
     
+    private IEnumerator StartTimer(int duration, Action onComplete)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            yield return new WaitForSeconds(1f);
+            onComplete?.Invoke();
+            elapsed += 1f;
+        }
+    }
+
+    // Assets/Scripts/GameManager.cs (replace the toggle part inside CheckHackTilemapCollision)
+    private string CheckHackTilemapCollision()
+    {
+        if (pacmanInstance == null || hackMap == null) return null;
+
+        Vector3 worldPos = pacmanInstance.transform.position;
+        Vector3Int centerCell = hackMap.WorldToCell(worldPos);
+
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                Vector3Int cellPos = new Vector3Int(centerCell.x + dx, centerCell.y + dy, centerCell.z);
+                TileBase tile = hackMap.GetTile(cellPos);
+                if (tile == null) continue;
+
+                if (tile is not InfoTile infoTile) continue;
+
+                // If locked, ignore interaction.
+                if (infoTile.isHackLocked) continue;
+
+                float lastTime = 0f;
+                hackLastToggleTime.TryGetValue(cellPos, out lastTime);
+                if (Time.time - lastTime < hackToggleCooldown) continue;
+
+                // Toggle state on the tile instance, then refresh visuals for that cell.
+                infoTile.isHackEnabled = !infoTile.isHackEnabled;
+                hackMap.RefreshTile(cellPos);
+
+                hackLastToggleTime[cellPos] = Time.time;
+                return infoTile.hackName;
+            }
+        }
+
+        return null;
+    }
+
+    private void SwapHackState(string hackName)
+    {
+        switch (hackName)
+        {
+            //PacMan
+            case "freeze":
+                GameSettings.instance.FreezeEnabled = !GameSettings.instance.FreezeEnabled;
+                break;
+            
+            case "clone":
+                GameSettings.instance.CloneEnabled = !GameSettings.instance.CloneEnabled;
+                break;
+            
+            case "speed_overflow":
+                GameSettings.instance.SpeedOverflowEnabled = !GameSettings.instance.SpeedOverflowEnabled;
+                break;
+            
+            //ghosts
+            case "vision_hack":
+                GameSettings.instance.VisionHackEnabled = !GameSettings.instance.VisionHackEnabled;
+                break;
+            
+            case "wall_phase":
+                GameSettings.instance.WallPhaseEnabled = !GameSettings.instance.WallPhaseEnabled;
+                break;
+            
+            case "fear_override":
+                GameSettings.instance.FearOverrideEnabled = !GameSettings.instance.FearOverrideEnabled;
+                break;
+            
+            //general
+            case "debug_mode":
+                GameSettings.instance.DebugModeEnabled = !GameSettings.instance.DebugModeEnabled;
+                break;
+            
+            case "no_clip":
+                GameSettings.instance.NoClipEnabled = !GameSettings.instance.NoClipEnabled;
+                break;
+        }
+    }
     
 }
