@@ -1,4 +1,3 @@
-// Assets/Scripts/Menu/InfoTile.cs
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,11 +11,10 @@ public class InfoTile : Tile
     public Sprite hackDisabledSprite;
     public Sprite hackEnabledSprite;
 
+    // These variables store runtime state. Since this is a ScriptableObject,
+    // this state is shared by all tiles using this specific asset file.
     public bool isHackLocked = true;
     public bool isHackEnabled = false;
-
-    // Avoid caching tileData/tilemap/position; GetTileData is called often.
-    private bool _initialized;
 
     public override void GetTileData(Vector3Int position, ITilemap tilemap, ref TileData tileData)
     {
@@ -28,26 +26,24 @@ public class InfoTile : Tile
             return;
         }
 
-        // One-time init of runtime state per tile instance.
-        if (!_initialized)
+        // We removed the '_initialized' latch. 
+        // Now it checks the AchievementManager every time the tile data is requested at runtime.
+        // This ensures that if the Tilemap renders BEFORE AchievementManager initializes, 
+        // it will correct itself on the next refresh instead of getting stuck in a locked state.
+        if (Application.isPlaying && AchievementManager.Instance != null)
         {
-            // Interpret Achievement completion however you intend.
-            // This keeps behavior similar to your original intent without caching tileData.
-            bool completed = AchievementManager.Instance != null &&
-                             AchievementManager.Instance.IsCompleted(achievement.id);
+            bool completed = AchievementManager.Instance.IsCompleted(achievement.id);
 
             if (completed)
             {
                 isHackLocked = false;
-                isHackEnabled = false;
             }
             else
             {
                 isHackLocked = true;
+                // If the hack is locked, force it to be disabled
                 isHackEnabled = false;
             }
-
-            _initialized = true;
         }
 
         if (isHackLocked)
@@ -58,9 +54,10 @@ public class InfoTile : Tile
             tileData.sprite = hackDisabledSprite;
     }
 
-    // Optional: call this when starting a new game/scene if you need re-init.
-    public void ResetRuntimeState()
+    // Ensures state is reset when the object is loaded (e.g. entering Play Mode with Domain Reload)
+    private void OnEnable()
     {
-        _initialized = false;
+        isHackLocked = true;
+        isHackEnabled = false;
     }
 }
