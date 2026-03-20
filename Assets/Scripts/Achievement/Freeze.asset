@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Achievement
   id: freeze
   title: Freeze
-  description: Stay alive and don't move for 15 seconds as PacMan
+  description: Stay alive and don't move for 10 seconds as PacMan
   icon: {fileID: 0}
-  targetProgress: 15
+  targetProgress: 10
