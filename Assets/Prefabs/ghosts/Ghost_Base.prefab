@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: -3696429549482444928}
   - component: {fileID: -989903718180344004}
   - component: {fileID: -4525620939679581553}
+  - component: {fileID: -4270091488968095039}
+  - component: {fileID: -2805858367596319866}
   m_Layer: 9
   m_Name: Ghost_Base
   m_TagString: Untagged
@@ -198,6 +200,36 @@ MonoBehaviour:
   blue: {fileID: 7204393190720350711}
   white: {fileID: 5310222970093573837}
   eaten: 0
+--- !u!114 &-4270091488968095039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 622914332600983866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d15f26612ca43a1bfae95b049419505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostEatenBehavior
+  duration: 0
+--- !u!114 &-2805858367596319866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 622914332600983866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4187e53fd2ca4b72af80e9982ffef19a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostAISelector
+  aiType: 0
+  pinkyTilesAhead: 4
+  inkyTilesAhead: 2
+  clydeChaseDistance: 8
+  clydeScatterCorner: {x: -100, y: -100}
 --- !u!1 &5011344104589961957
 GameObject:
   m_ObjectHideFlags: 0

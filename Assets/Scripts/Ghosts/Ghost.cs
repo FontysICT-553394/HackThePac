@@ -9,6 +9,7 @@ public class Ghost : MonoBehaviour
     public GhostScatter scatter { get; private set; }
     public GhostChase chase { get; private set; }
     public GhostFrightened frightened { get; set; }
+    public GhostEatenBehavior eatenBehavior { get; private set; }
     public GhostBehavior initialBehavior;
     public Transform target;
     public int points = 200;
@@ -20,6 +21,7 @@ public class Ghost : MonoBehaviour
         scatter = GetComponent<GhostScatter>();
         chase = GetComponent<GhostChase>();
         frightened = GetComponent<GhostFrightened>();
+        eatenBehavior = GetComponent<GhostEatenBehavior>();
     }
 
     private void Start()
@@ -34,6 +36,7 @@ public class Ghost : MonoBehaviour
 
         if (frightened != null) frightened.Disable();
         if (chase != null) chase.Disable();
+        if (eatenBehavior != null) eatenBehavior.Disable();
         if (scatter != null) scatter.Enable();
 
         if (home != null && home != initialBehavior)
@@ -49,7 +52,6 @@ public class Ghost : MonoBehaviour
 
     public void SetPosition(Vector3 position)
     {
-        // Keep the z-position the same since it determines draw depth
         position.z = transform.position.z;
         transform.position = position;
     }
@@ -68,5 +70,4 @@ public class Ghost : MonoBehaviour
             }
         }
     }
-
 }

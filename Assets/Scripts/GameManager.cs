@@ -101,6 +101,9 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
+        AudioManager.Instance.PlayIntro();
+        pelletTilemapCollider2D = pelletTilemap.GetComponent<TilemapCollider2D>();
+        powerPelletTilemapCollider2D = powerPelletTilemap.GetComponent<TilemapCollider2D>();
         pelletMap = pelletTilemap.GetComponent<Tilemap>();
         powerPelletMap = powerPelletTilemap.GetComponent<Tilemap>();
         hackMap = hackTilemap.GetComponent<Tilemap>();
@@ -318,6 +321,7 @@ public class GameManager : MonoBehaviour
 
     public void GhostEaten(Ghost ghost)
     {
+        AudioManager.Instance.PlayGhostEaten();
         int points = ghost.points * ghostMultiplier;
         AddScore(points);
         ghostMultiplier++;
@@ -330,11 +334,13 @@ public class GameManager : MonoBehaviour
     {
         if (tilemap.HasTile(cellPos))
         {
+            AudioManager.Instance.PlayPellet();
             tilemap.SetTile(cellPos, null);
         }
 
         if (isPowerPellet)
         {
+            AudioManager.Instance.PlayPowerPellet();
             PowerPelletEatenEffect();
         }
     }
