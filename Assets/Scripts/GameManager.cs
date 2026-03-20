@@ -607,37 +607,37 @@ public class GameManager : MonoBehaviour
         {
             //PacMan
             case "freeze":
-                GameSettings.instance.freezeEnabled = !GameSettings.instance.freezeEnabled;
+                GameSettings.instance.FreezeEnabled = !GameSettings.instance.FreezeEnabled;
                 break;
             
             case "clone":
-                GameSettings.instance.cloneEnabled = !GameSettings.instance.cloneEnabled;
+                GameSettings.instance.CloneEnabled = !GameSettings.instance.CloneEnabled;
                 break;
             
             case "speed_overflow":
-                GameSettings.instance.speedOverflowEnabled = !GameSettings.instance.speedOverflowEnabled;
+                GameSettings.instance.SpeedOverflowEnabled = !GameSettings.instance.SpeedOverflowEnabled;
                 break;
             
             //ghosts
             case "vision_hack":
-                GameSettings.instance.visionHackEnabled = !GameSettings.instance.visionHackEnabled;
+                GameSettings.instance.VisionHackEnabled = !GameSettings.instance.VisionHackEnabled;
                 break;
             
             case "wall_phase":
-                GameSettings.instance.wallPhaseEnabled = !GameSettings.instance.wallPhaseEnabled;
+                GameSettings.instance.WallPhaseEnabled = !GameSettings.instance.WallPhaseEnabled;
                 break;
             
             case "fear_override":
-                GameSettings.instance.fearOverrideEnabled = !GameSettings.instance.fearOverrideEnabled;
+                GameSettings.instance.FearOverrideEnabled = !GameSettings.instance.FearOverrideEnabled;
                 break;
             
             //general
             case "debug_mode":
-                GameSettings.instance.debugModeEnabled = !GameSettings.instance.debugModeEnabled;
+                GameSettings.instance.DebugModeEnabled = !GameSettings.instance.DebugModeEnabled;
                 break;
             
             case "no_clip":
-                GameSettings.instance.noClipEnabled = !GameSettings.instance.noClipEnabled;
+                GameSettings.instance.NoClipEnabled = !GameSettings.instance.NoClipEnabled;
                 break;
         }
     }
