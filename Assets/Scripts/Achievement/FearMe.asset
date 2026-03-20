@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Achievement
   id: fear_me
   title: Fear Me
-  description: Kill PacMan within 3 seconds of the power pellet wearing of as a ghost
+  description: Kill PacMan within 3 seconds of the power pellet wearing off as a
+    ghost
   icon: {fileID: 0}
   targetProgress: 3

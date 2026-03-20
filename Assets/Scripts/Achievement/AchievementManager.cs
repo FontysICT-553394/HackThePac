@@ -42,6 +42,11 @@ public class AchievementManager : MonoBehaviour
     {
         LoadProgress();
     }
+    
+    public Achievement GetAchievementById(string achievementId)
+    {
+        return allAchievements.FirstOrDefault(a => a.id == achievementId);
+    }
 
     /// <summary>
     /// Add progress to an achievement by its id. Automatically saves and fires events.
@@ -65,6 +70,35 @@ public class AchievementManager : MonoBehaviour
             return;
 
         entry.currentProgress = Mathf.Min(entry.currentProgress + amount, definition.targetProgress);
+        OnAchievementProgressChanged?.Invoke(definition, entry);
+
+        if (entry.currentProgress >= definition.targetProgress)
+        {
+            entry.isCompleted = true;
+            Debug.Log($"[AchievementManager] Achievement unlocked: {definition.title}");
+            OnAchievementUnlocked?.Invoke(definition);
+        }
+
+        SaveProgress();
+    }
+    
+    public void SetProgress(string achievementId, int amount) { 
+        var definition = allAchievements.FirstOrDefault(a => a.id == achievementId);
+        if (definition == null)
+        {
+            Debug.LogWarning($"[AchievementManager] Unknown achievement id: {achievementId}"); return;
+        }
+        
+        if (!_progressMap.TryGetValue(achievementId, out var entry))
+        {
+            entry = new AchievementEntry { id = achievementId, currentProgress = 0, isCompleted = false };
+            _progressMap[achievementId] = entry;
+        }
+
+        if (entry.isCompleted)
+            return;
+
+        entry.currentProgress = Mathf.Min(amount, definition.targetProgress);
         OnAchievementProgressChanged?.Invoke(definition, entry);
 
         if (entry.currentProgress >= definition.targetProgress)
