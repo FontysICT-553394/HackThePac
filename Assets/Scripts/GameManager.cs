@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [Header("PacMan Settings")]
-    [SerializeField] private GameObject pacmanPrefab;
-    [SerializeField] private Transform pacmanSpawnPoint;
+    [SerializeField] public GameObject pacmanPrefab;
+    [SerializeField] public Transform pacmanSpawnPoint;
 
     [Header("Ghost Settings")]
     [SerializeField] private List<GameObject> ghostPrefabs;
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameWinUI;
     [SerializeField] private GameObject gameLoseUI;
 
-    private Ghost[] ghosts;
+    public Ghost[] ghosts { get; private set; }
     private PacMan pacman;
     private Transform pellets;
     private Text gameOverText;

@@ -121,6 +121,11 @@ public class PacMan : MonoBehaviour
 
     private void OnCollisionWithGhost()
     {
+        if (gameObject.name == "PacMan_Clone_Hack")
+        {
+            Destroy(gameObject);
+            return;
+        }
         AudioManager.Instance.PlayDeath();
         // GhostHouseController.Instance.OnLifeLost();
         _isDead = true;
