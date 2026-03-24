@@ -567,53 +567,66 @@ public class GameManager : MonoBehaviour
             elapsed += 1f;
         }
     }
-
-    // Assets/Scripts/GameManager.cs (replace the toggle part inside CheckHackTilemapCollision)
-    private string CheckHackTilemapCollision()
+    
+   private string CheckHackTilemapCollision()
+{
+    GameObject player = pacmanInstance;
+    if (GameSettings.instance != null && GameSettings.instance.selectedCharacter != "pacman")
     {
-        // Use the actual player object (could be PacMan or a ghost) rather than always using pacmanInstance.
-        GameObject player = pacmanInstance;
-        if (GameSettings.instance != null && GameSettings.instance.selectedCharacter != "pacman")
-        {
-            string playerName = GameSettings.instance.selectedCharacter + "(Clone)";
-            var found = GameObject.Find(playerName);
-            if (found != null)
-                player = found;
-        }
-
-        if (player == null || hackMap == null) return null;
-
-        Vector3 worldPos = player.transform.position;
-        Vector3Int centerCell = hackMap.WorldToCell(worldPos);
-
-        for (int dx = -1; dx <= 1; dx++)
-        {
-            for (int dy = -1; dy <= 1; dy++)
-            {
-                Vector3Int cellPos = new Vector3Int(centerCell.x + dx, centerCell.y + dy, centerCell.z);
-                TileBase tile = hackMap.GetTile(cellPos);
-                if (tile == null) continue;
-
-                if (tile is not InfoTile infoTile) continue;
-
-                // If locked, ignore interaction.
-                if (infoTile.isHackLocked) continue;
-
-                float lastTime = 0f;
-                hackLastToggleTime.TryGetValue(cellPos, out lastTime);
-                if (Time.time - lastTime < hackToggleCooldown) continue;
-
-                // Toggle state on the tile instance, then refresh visuals for that cell.
-                infoTile.isHackEnabled = !infoTile.isHackEnabled;
-                hackMap.RefreshTile(cellPos);
-
-                hackLastToggleTime[cellPos] = Time.time;
-                return infoTile.hackName;
-            }
-        }
-
-        return null;
+        string playerName = GameSettings.instance.selectedCharacter + "(Clone)";
+        var found = GameObject.Find(playerName);
+        if (found != null)
+            player = found;
     }
+
+    if (player == null || hackMap == null) return null;
+
+    Vector3 worldPos = player.transform.position;
+    Vector3Int centerCell = hackMap.WorldToCell(worldPos);
+
+    for (int dx = -1; dx <= 1; dx++)
+    {
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            Vector3Int cellPos = new Vector3Int(centerCell.x + dx, centerCell.y + dy, centerCell.z);
+            TileBase tile = hackMap.GetTile(cellPos);
+            if (tile == null) continue;
+
+            if (tile is not InfoTile infoTile) continue;
+
+            // If locked, ignore interaction.
+            if (infoTile.isHackLocked) continue;
+
+            // Determine allowed actors.
+            bool forPac = infoTile.isHackForPacMan;
+            bool forGhost = infoTile.isHackForGhost;
+
+            // If no one is allowed, skip.
+            if (!forPac && !forGhost) continue;
+
+            bool playerIsPacman = GameSettings.instance != null && GameSettings.instance.selectedCharacter == "pacman";
+
+            // If it's only for PacMan, block ghosts.
+            if (forPac && !forGhost && !playerIsPacman) continue;
+
+            // If it's only for Ghosts, block PacMan.
+            if (forGhost && !forPac && playerIsPacman) continue;
+
+            float lastTime = 0f;
+            hackLastToggleTime.TryGetValue(cellPos, out lastTime);
+            if (Time.time - lastTime < hackToggleCooldown) continue;
+
+            // Toggle state on the tile instance, then refresh visuals for that cell.
+            infoTile.isHackEnabled = !infoTile.isHackEnabled;
+            hackMap.RefreshTile(cellPos);
+
+            hackLastToggleTime[cellPos] = Time.time;
+            return infoTile.hackName;
+        }
+    }
+
+    return null;
+}
 
     private void SwapHackState(string hackName)
     {
