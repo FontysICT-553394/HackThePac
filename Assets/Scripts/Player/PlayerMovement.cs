@@ -22,9 +22,13 @@ public class PlayerMovement : MonoBehaviour
     private Coroutine speedCoroutine = null;
     private Coroutine cloneCoroutine = null;
     private Coroutine freezeCoroutine = null;
+    private Coroutine fearCoroutine = null;
+    private Coroutine visionCoroutine = null;
+    private int visionHacksLeft = 3;
     private int speedHacksLeft = 3;
     private int cloneHacksLeft = 3;
     private int freezeHacksLeft = 2;
+    private int fearHacksLeft = 2;
 
     private void Awake()
     {
@@ -61,150 +65,15 @@ public class PlayerMovement : MonoBehaviour
             _queuedDirection = Vector2.right;
         //Hacks
         else if (Keyboard.current.zKey.wasPressedThisFrame && GameSettings.instance.FreezeEnabled)
-        {
-            if (freezeHacksLeft <= 0 && freezeCoroutine == null) return;
-            
-            float duration = 10, sliderMaxVal = 0f;
-            Slider slider = null;
-            TMP_Text text = null;
-            
-            foreach (var e in GameSettings.instance.freezeHackUIElements)
-            {
-                if (e == null) continue;
-                if (slider == null)
-                    slider = e.GetComponent<Slider>();
-                if (text == null)
-                    text = e.GetComponent<TMP_Text>();
-
-                if (slider != null)
-                    sliderMaxVal = slider.maxValue;
-            }
-
-            GameObject blinky = GameObject.Find("Blinky(Clone)");
-            GameObject inky = GameObject.Find("Inky(Clone)");
-            GameObject clyde = GameObject.Find("Clyde(Clone)");
-            GameObject pinky = GameObject.Find("Pinky(Clone)");
-            List<MonoBehaviour> blinkyScriptsEnabled = new();
-            List<MonoBehaviour> inkyScriptsEnabled = new();
-            List<MonoBehaviour> clydeScriptsEnabled = new();
-            List<MonoBehaviour> pinkyScriptsEnabled = new();
-
-            foreach (var comp in blinky.GetComponents<MonoBehaviour>())
-                if (comp.enabled) { blinkyScriptsEnabled.Add(comp); comp.enabled = false; }
-            
-            foreach (var comp in inky.GetComponents<MonoBehaviour>())
-                if (comp.enabled) { inkyScriptsEnabled.Add(comp); comp.enabled = false; }
-            
-            foreach (var comp in pinky.GetComponents<MonoBehaviour>())
-                if (comp.enabled) { pinkyScriptsEnabled.Add(comp); comp.enabled = false; }
-            
-            foreach (var comp in clyde.GetComponents<MonoBehaviour>())
-                if (comp.enabled) { clydeScriptsEnabled.Add(comp); comp.enabled = false; }
-            
-            freezeHacksLeft--;
-            if (text != null)
-                text.text = "Freeze: \n [Z] - " + freezeHacksLeft + "x";
-            
-            freezeCoroutine = StartCoroutine(StartTimer(duration, () =>
-            {
-                if (slider != null)
-                    slider.value = sliderMaxVal;
-
-                foreach (var comp in blinkyScriptsEnabled) comp.enabled = true;
-                foreach (var comp in pinkyScriptsEnabled) comp.enabled = true;
-                foreach (var comp in clydeScriptsEnabled) comp.enabled = true;
-                foreach (var comp in inkyScriptsEnabled) comp.enabled = true;
-                
-                freezeCoroutine = null;
-            }));
-
-            if (slider != null)
-                StartCoroutine(AnimateSliders(slider, duration));
-        }
+            FreezeHack();
         else if (Keyboard.current.cKey.wasPressedThisFrame && GameSettings.instance.CloneEnabled)
-        {
-            if (cloneHacksLeft <= 0) return;
-            
-            float duration = 10, sliderMaxVal = 0f;
-            Slider slider = null;
-            TMP_Text text = null;
-            
-            foreach (var e in GameSettings.instance.cloneHackUIElements)
-            {
-                if (e == null) continue;
-                if (slider == null)
-                    slider = e.GetComponent<Slider>();
-                if (text == null)
-                    text = e.GetComponent<TMP_Text>();
-
-                if (slider != null)
-                    sliderMaxVal = slider.maxValue;
-            }
-            
-            var pacmanClone = Instantiate(GameManager.Instance.pacmanPrefab, GameManager.Instance.pacmanSpawnPoint.position, GameManager.Instance.pacmanSpawnPoint.rotation);
-            pacmanClone.name = "PacMan_Clone_Hack";
-            pacmanClone.AddComponent<PacManAI>();
-
-            cloneHacksLeft--;
-            if (text != null)
-                text.text = "Clone: \n [C] - " + cloneHacksLeft + "x";
-            
-            StartCoroutine(StartTimer(duration, () =>
-            {
-                if (slider != null)
-                    slider.value = sliderMaxVal;
-                Destroy(pacmanClone);
-                
-                cloneCoroutine = null;
-            }));
-
-            if (slider != null)
-                StartCoroutine(AnimateSliders(slider, duration));
-        }
+            CloneHack();
         else if (Keyboard.current.xKey.wasPressedThisFrame && GameSettings.instance.SpeedOverflowEnabled)
-        {
-            if (speedHacksLeft <= 0 || speedCoroutine != null) return;
-
-            float duration = 3, sliderMaxVal = 0f, originalSpeed = moveSpeed;
-            Slider slider = null;
-            TMP_Text text = null;
-
-            foreach (var e in GameSettings.instance.speedOverflowUIElements)
-            {
-                if (e == null) continue;
-                if (slider == null)
-                    slider = e.GetComponent<Slider>();
-                if (text == null)
-                    text = e.GetComponent<TMP_Text>();
-
-                if (slider != null)
-                    sliderMaxVal = slider.maxValue;
-            }
-
-            moveSpeed = originalSpeed * 3;
-            speedHacksLeft--;
-            if (text != null)
-                text.text = "Speed: \n [X] - " + speedHacksLeft + "x";
-
-            speedCoroutine = StartCoroutine(StartTimer(duration, () =>
-            {
-                moveSpeed = originalSpeed;
-                if (slider != null)
-                    slider.value = sliderMaxVal;
-                speedCoroutine = null;
-            }));
-
-            if (slider != null)
-                StartCoroutine(AnimateSliders(slider, duration));
-        }
+            SpeedOverflowHack();
         else if (Keyboard.current.vKey.wasPressedThisFrame && GameSettings.instance.FearOverrideEnabled)
-        {
-            
-        }
+            FearOverrideHack();
         else if (Keyboard.current.bKey.wasPressedThisFrame && GameSettings.instance.VisionHackEnabled)
-        {
-            
-        }
+            VisionHack();
     }
 
     private void TryQueuedDirection()
@@ -319,4 +188,196 @@ public class PlayerMovement : MonoBehaviour
         // Ensure slider ends at 0
         slider.value = 0f;
     }
+
+    private void FreezeHack()
+    {
+        if (freezeHacksLeft <= 0 && freezeCoroutine == null) return;
+            
+        float duration = 10, sliderMaxVal = 0f;
+        Slider slider = null;
+        TMP_Text text = null;
+            
+        foreach (var e in GameSettings.instance.freezeHackUIElements)
+        {
+            if (e == null) continue;
+            if (slider == null)
+                slider = e.GetComponent<Slider>();
+            if (text == null)
+                text = e.GetComponent<TMP_Text>();
+
+            if (slider != null)
+                sliderMaxVal = slider.maxValue;
+        }
+
+        GameObject blinky = GameObject.Find("Blinky(Clone)");
+        GameObject inky = GameObject.Find("Inky(Clone)");
+        GameObject clyde = GameObject.Find("Clyde(Clone)");
+        GameObject pinky = GameObject.Find("Pinky(Clone)");
+        List<MonoBehaviour> blinkyScriptsEnabled = new();
+        List<MonoBehaviour> inkyScriptsEnabled = new();
+        List<MonoBehaviour> clydeScriptsEnabled = new();
+        List<MonoBehaviour> pinkyScriptsEnabled = new();
+
+        foreach (var comp in blinky.GetComponents<MonoBehaviour>())
+            if (comp.enabled) { blinkyScriptsEnabled.Add(comp); comp.enabled = false; }
+            
+        foreach (var comp in inky.GetComponents<MonoBehaviour>())
+            if (comp.enabled) { inkyScriptsEnabled.Add(comp); comp.enabled = false; }
+            
+        foreach (var comp in pinky.GetComponents<MonoBehaviour>())
+            if (comp.enabled) { pinkyScriptsEnabled.Add(comp); comp.enabled = false; }
+            
+        foreach (var comp in clyde.GetComponents<MonoBehaviour>())
+            if (comp.enabled) { clydeScriptsEnabled.Add(comp); comp.enabled = false; }
+            
+        freezeHacksLeft--;
+        if (text != null)
+            text.text = "Freeze: \n [Z] - " + freezeHacksLeft + "x";
+            
+        freezeCoroutine = StartCoroutine(StartTimer(duration, () =>
+        {
+            if (slider != null)
+                slider.value = sliderMaxVal;
+
+            foreach (var comp in blinkyScriptsEnabled) comp.enabled = true;
+            foreach (var comp in pinkyScriptsEnabled) comp.enabled = true;
+            foreach (var comp in clydeScriptsEnabled) comp.enabled = true;
+            foreach (var comp in inkyScriptsEnabled) comp.enabled = true;
+                
+            freezeCoroutine = null;
+        }));
+
+        if (slider != null)
+            StartCoroutine(AnimateSliders(slider, duration));
+    }
+
+    private void CloneHack()
+    {
+        if (cloneHacksLeft <= 0) return;
+            
+        float duration = 10, sliderMaxVal = 0f;
+        Slider slider = null;
+        TMP_Text text = null;
+            
+        foreach (var e in GameSettings.instance.cloneHackUIElements)
+        {
+            if (e == null) continue;
+            if (slider == null)
+                slider = e.GetComponent<Slider>();
+            if (text == null)
+                text = e.GetComponent<TMP_Text>();
+
+            if (slider != null)
+                sliderMaxVal = slider.maxValue;
+        }
+            
+        var pacmanClone = Instantiate(GameManager.Instance.pacmanPrefab, GameManager.Instance.pacmanSpawnPoint.position, GameManager.Instance.pacmanSpawnPoint.rotation);
+        pacmanClone.name = "PacMan_Clone_Hack";
+        pacmanClone.AddComponent<PacManAI>();
+
+        cloneHacksLeft--;
+        if (text != null)
+            text.text = "Clone: \n [C] - " + cloneHacksLeft + "x";
+            
+        StartCoroutine(StartTimer(duration, () =>
+        {
+            if (slider != null)
+                slider.value = sliderMaxVal;
+            Destroy(pacmanClone);
+                
+            cloneCoroutine = null;
+        }));
+
+        if (slider != null)
+            StartCoroutine(AnimateSliders(slider, duration));
+    }
+
+    private void SpeedOverflowHack()
+    {
+        if (speedHacksLeft <= 0 || speedCoroutine != null) return;
+
+        float duration = 3, sliderMaxVal = 0f, originalSpeed = moveSpeed;
+        Slider slider = null;
+        TMP_Text text = null;
+
+        foreach (var e in GameSettings.instance.speedOverflowUIElements)
+        {
+            if (e == null) continue;
+            if (slider == null)
+                slider = e.GetComponent<Slider>();
+            if (text == null)
+                text = e.GetComponent<TMP_Text>();
+
+            if (slider != null)
+                sliderMaxVal = slider.maxValue;
+        }
+
+        moveSpeed = originalSpeed * 3;
+        speedHacksLeft--;
+        if (text != null)
+            text.text = "Speed: \n [X] - " + speedHacksLeft + "x";
+
+        speedCoroutine = StartCoroutine(StartTimer(duration, () =>
+        {
+            moveSpeed = originalSpeed;
+            if (slider != null)
+                slider.value = sliderMaxVal;
+            speedCoroutine = null;
+        }));
+
+        if (slider != null)
+            StartCoroutine(AnimateSliders(slider, duration));
+    }
+    
+    private void FearOverrideHack()
+    {
+        if (fearHacksLeft <= 0) return;
+        
+        TMP_Text text = null;
+        foreach (var e in GameSettings.instance.fearHackUIElements)
+        {
+            if (e == null) continue; ;
+            if (text == null)
+                text = e.GetComponent<TMP_Text>();
+        }
+
+        string characterName = GameSettings.instance.selectedCharacter + "(Clone)";
+        GameObject character = GameObject.Find(characterName);
+        if (character != null)
+        {
+            var ghostScript = character.GetComponent<Ghost>();
+            ghostScript.frightened.Disable();
+        }
+        
+        fearHacksLeft--;
+        if (text != null)
+            text.text = "Fear: \n [V] - " + fearHacksLeft + "x";
+    }
+    
+    private void VisionHack()
+    {
+        if (visionHacksLeft <= 0 || visionCoroutine != null) return;
+
+        float duration = 5f, sliderMaxVal = 0f;
+        Slider slider = null;
+        TMP_Text text = null;
+
+        foreach (var e in GameSettings.instance.visionHackUIElements)
+        {
+            if (e == null) continue;
+            if (slider == null) slider = e.GetComponent<Slider>();
+            if (text == null) text = e.GetComponent<TMP_Text>();
+
+            if (slider != null) sliderMaxVal = slider.maxValue;
+        }
+
+        //TODO: Add vision hack effect; reveal PacMan's AI planned path;
+        
+        visionHacksLeft--;
+        if (text != null) text.text = "Vision: \n [B] - " + visionHacksLeft + "x";
+        
+        if (slider != null)
+            StartCoroutine(AnimateSliders(slider, duration));
+    }
+
 }

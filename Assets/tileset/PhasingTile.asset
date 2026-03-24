@@ -35,7 +35,9 @@ MonoBehaviour:
   m_Flags: 1
   m_ColliderType: 1
   achievement: {fileID: 11400000, guid: 4eb7dfbad9945306ca5e3f4182ebf726, type: 2}
-  hackName: 
+  hackName: wall_phase
   hackLockedSprite: {fileID: -2127006833, guid: 14bf263d1b83f093db5875a0a6a07831, type: 3}
   hackDisabledSprite: {fileID: -256182486513637855, guid: c786391c929f740d9887c5f752799969, type: 3}
   hackEnabledSprite: {fileID: -862809864, guid: a035de8c0a6b06d24a82a82509bf1769, type: 3}
+  isHackLocked: 1
+  isHackEnabled: 0

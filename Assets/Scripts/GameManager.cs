@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
 
     // per-cell cooldown for hack toggles (seconds)
     private float hackToggleCooldown = 1f;
-    private Dictionary<Vector3Int, float> hackLastToggleTime = new Dictionary<Vector3Int, float>();
+    private Dictionary<Vector3Int, float> hackLastToggleTime = new();
     
     private void Awake()
     {
@@ -571,9 +571,19 @@ public class GameManager : MonoBehaviour
     // Assets/Scripts/GameManager.cs (replace the toggle part inside CheckHackTilemapCollision)
     private string CheckHackTilemapCollision()
     {
-        if (pacmanInstance == null || hackMap == null) return null;
+        // Use the actual player object (could be PacMan or a ghost) rather than always using pacmanInstance.
+        GameObject player = pacmanInstance;
+        if (GameSettings.instance != null && GameSettings.instance.selectedCharacter != "pacman")
+        {
+            string playerName = GameSettings.instance.selectedCharacter + "(Clone)";
+            var found = GameObject.Find(playerName);
+            if (found != null)
+                player = found;
+        }
 
-        Vector3 worldPos = pacmanInstance.transform.position;
+        if (player == null || hackMap == null) return null;
+
+        Vector3 worldPos = player.transform.position;
         Vector3Int centerCell = hackMap.WorldToCell(worldPos);
 
         for (int dx = -1; dx <= 1; dx++)

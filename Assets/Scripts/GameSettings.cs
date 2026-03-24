@@ -60,9 +60,9 @@ public class GameSettings : MonoBehaviour
         }
     }
 
-    // Hacks \- Ghost
+    // Hacks - Ghost
     [SerializeField] private bool fearOverrideEnabled = false;
-    [SerializeField] private List<GameObject> fearHackUIElements = new();
+    [SerializeField] public List<GameObject> fearHackUIElements = new();
     public event Action<bool> FearOverrideChanged;
     public void SubscribeFearOverrideChanged(Action<bool> handler) => FearOverrideChanged += handler;
     public void UnsubscribeFearOverrideChanged(Action<bool> handler) => FearOverrideChanged -= handler;
@@ -78,7 +78,7 @@ public class GameSettings : MonoBehaviour
     }
 
     [SerializeField] private bool visionHackEnabled = false;
-    [SerializeField] private List<GameObject> visionHackUIElements = new();
+    [SerializeField] public List<GameObject> visionHackUIElements = new();
     public event Action<bool> VisionHackChanged;
     public void SubscribeVisionHackChanged(Action<bool> handler) => VisionHackChanged += handler;
     public void UnsubscribeVisionHackChanged(Action<bool> handler) => VisionHackChanged -= handler;
