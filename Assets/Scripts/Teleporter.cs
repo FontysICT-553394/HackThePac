@@ -26,11 +26,21 @@ public class Teleporter : MonoBehaviour
     
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.CompareTag("Player"))
+        {
+            FindObjectOfType<GlitchEffect>().Flash();
+        }
+
         if (Time.time - _lastTeleportTime < teleportCooldown)
             return;
 
         if (TrySecretTeleport(other.transform))
             return;
+        
+        if (other.CompareTag("Player"))
+        {
+            FindObjectOfType<GlitchEffect>().TriggerStep();
+        }
 
         var otherTeleporter = targetTeleportLocation.GetComponent<Teleporter>();
         if (otherTeleporter != null)
