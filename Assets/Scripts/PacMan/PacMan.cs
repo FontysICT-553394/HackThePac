@@ -13,6 +13,7 @@ public class PacMan : MonoBehaviour
     private BoxCollider2D _pacmanCollider2D;
     private TilemapCollider2D _powerPelletTilemapCollider2D;
     private TilemapCollider2D _pelletTilemapCollider2D;
+    private TilemapCollider2D _wallPhaseAchievementCollider2D;
 
     private Tilemap _pelletTilemapComponent;
     private Tilemap _powerPelletTilemapComponent;
@@ -29,6 +30,7 @@ public class PacMan : MonoBehaviour
         _powerPelletTilemap = GameObject.Find("powerpelletsTilemap");
         _pelletTilemapComponent = _pelletTilemap.GetComponent<Tilemap>();
         _powerPelletTilemapComponent = _powerPelletTilemap.GetComponent<Tilemap>();
+        _wallPhaseAchievementCollider2D = GameObject.Find("wallPhaseAchievement").GetComponent<TilemapCollider2D>();
         
         _gameManager = FindObjectOfType<GameManager>();
         _pacmanCollider2D = gameObject.GetComponent<BoxCollider2D>();
@@ -43,6 +45,9 @@ public class PacMan : MonoBehaviour
 
     private void Update()
     {
+        if (_wallPhaseAchievementCollider2D.IsTouching(_pacmanCollider2D) && GameSettings.instance.selectedCharacter == "pacman")
+            AchievementManager.Instance.SetProgress("phasing", 1);
+        
         if (_pelletTilemapCollider2D.IsTouching(_pacmanCollider2D))
             EatPellet();
 
@@ -121,6 +126,11 @@ public class PacMan : MonoBehaviour
 
     private void OnCollisionWithGhost()
     {
+        if (gameObject.name == "PacMan_Clone_Hack")
+        {
+            Destroy(gameObject);
+            return;
+        }
         AudioManager.Instance.PlayDeath();
         // GhostHouseController.Instance.OnLifeLost();
         _isDead = true;
