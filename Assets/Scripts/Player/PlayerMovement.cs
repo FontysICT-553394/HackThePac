@@ -208,27 +208,36 @@ public class PlayerMovement : MonoBehaviour
             if (slider != null)
                 sliderMaxVal = slider.maxValue;
         }
-
-        GameObject blinky = GameObject.Find("Blinky(Clone)");
-        GameObject inky = GameObject.Find("Inky(Clone)");
-        GameObject clyde = GameObject.Find("Clyde(Clone)");
-        GameObject pinky = GameObject.Find("Pinky(Clone)");
+        
         List<MonoBehaviour> blinkyScriptsEnabled = new();
         List<MonoBehaviour> inkyScriptsEnabled = new();
         List<MonoBehaviour> clydeScriptsEnabled = new();
         List<MonoBehaviour> pinkyScriptsEnabled = new();
 
-        foreach (var comp in blinky.GetComponents<MonoBehaviour>())
-            if (comp.enabled) { blinkyScriptsEnabled.Add(comp); comp.enabled = false; }
-            
-        foreach (var comp in inky.GetComponents<MonoBehaviour>())
-            if (comp.enabled) { inkyScriptsEnabled.Add(comp); comp.enabled = false; }
-            
-        foreach (var comp in pinky.GetComponents<MonoBehaviour>())
-            if (comp.enabled) { pinkyScriptsEnabled.Add(comp); comp.enabled = false; }
-            
-        foreach (var comp in clyde.GetComponents<MonoBehaviour>())
-            if (comp.enabled) { clydeScriptsEnabled.Add(comp); comp.enabled = false; }
+        GameObject blinky = GameObject.Find("Blinky(Clone)");
+        GameObject inky = GameObject.Find("Inky(Clone)");
+        GameObject clyde = GameObject.Find("Clyde(Clone)");
+        GameObject pinky = GameObject.Find("Pinky(Clone)");
+
+        void DisableAndTrack(GameObject ghost, List<MonoBehaviour> trackedList)
+        {
+            if (ghost == null) return;
+            foreach (var comp in ghost.GetComponents<MonoBehaviour>())
+            {
+                if (comp is GhostHome) continue;
+
+                if (comp.enabled)
+                {
+                    trackedList.Add(comp);
+                    comp.enabled = false;
+                }
+            }
+        }
+
+        DisableAndTrack(blinky, blinkyScriptsEnabled);
+        DisableAndTrack(inky, inkyScriptsEnabled);
+        DisableAndTrack(pinky, pinkyScriptsEnabled);
+        DisableAndTrack(clyde, clydeScriptsEnabled);
             
         freezeHacksLeft--;
         if (text != null)

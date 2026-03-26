@@ -46,9 +46,6 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (GameSettings.instance != null && GameSettings.instance.FreezeEnabled)
-            return;
-        
         Vector2 position = rb.position;
 
         float finalSpeed = speed + GameSettings.instance.ghostSpeed;
@@ -79,5 +76,4 @@ public class Movement : MonoBehaviour
         RaycastHit2D hit = Physics2D.BoxCast(transform.position, Vector2.one * 0.75f, 0f, direction, 1.5f, obstacleLayer);
         return hit.collider != null;
     }
-
 }

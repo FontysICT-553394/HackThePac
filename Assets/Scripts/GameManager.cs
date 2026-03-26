@@ -300,6 +300,7 @@ public class GameManager : MonoBehaviour
     {
         var playerCharacterName = GameSettings.instance.selectedCharacter;
         var character = GameObject.Find(playerCharacterName + "(Clone)");
+        character.tag = "Player";
         character.AddComponent<PlayerMovement>().wallLayer = LayerMask.GetMask("walls");
     }
 

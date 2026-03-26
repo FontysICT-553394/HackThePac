@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
- 
+using System.Collections.Generic;
+
 public class GlitchEffect : MonoBehaviour
 {
     public Image flashImage;
@@ -20,7 +21,12 @@ public class GlitchEffect : MonoBehaviour
     private Coroutine stepDownCoroutine;    
     
     private bool _isPacmanInGlitchRoom;
-    
+    private bool frozen = false;
+    List<MonoBehaviour> blinkyScriptsEnabled = new();
+    List<MonoBehaviour> inkyScriptsEnabled = new();
+    List<MonoBehaviour> clydeScriptsEnabled = new();
+    List<MonoBehaviour> pinkyScriptsEnabled = new();
+    List<MonoBehaviour> pacmanScriptsEnabled = new();
     
     void Start()
     {
@@ -138,8 +144,68 @@ public class GlitchEffect : MonoBehaviour
         if (GameSettings.instance == null)
             return;
 
-        GameSettings.instance.FreezeEnabled = currentLevel == 4;
+        if(currentLevel >= 4)
+        {
+            if(frozen) 
+                return;
+
+            GameObject blinky = GameObject.Find("Blinky(Clone)");
+            GameObject inky = GameObject.Find("Inky(Clone)");
+            GameObject clyde = GameObject.Find("Clyde(Clone)");
+            GameObject pinky = GameObject.Find("Pinky(Clone)");
+            
+            void DisableAndTrack(GameObject ghost, List<MonoBehaviour> trackedList)
+            {
+                if (ghost == null) return;
+                foreach (var comp in ghost.GetComponents<MonoBehaviour>())
+                {
+                    if (comp is GhostHome) continue;
+
+                    if (comp.enabled)
+                    {
+                        trackedList.Add(comp);
+                        comp.enabled = false;
+                    }
+                }
+            }
+
+            if (GameSettings.instance.selectedCharacter != "pacman")
+            {
+                GameObject pacman = GameObject.Find("pacman(Clone)");
+                DisableAndTrack(pacman, pacmanScriptsEnabled);
+            }
+            
+            if(GameSettings.instance.selectedCharacter != "Blinky")
+                DisableAndTrack(blinky, blinkyScriptsEnabled);
+            if(GameSettings.instance.selectedCharacter != "Inky")
+                DisableAndTrack(inky, inkyScriptsEnabled);
+            if(GameSettings.instance.selectedCharacter != "Pinky")
+                DisableAndTrack(pinky, pinkyScriptsEnabled);
+            if(GameSettings.instance.selectedCharacter != "Clyde")
+                DisableAndTrack(clyde, clydeScriptsEnabled);
+
+            frozen = true;
+        }
+        else
+        {
+            if (!frozen) return;
+            
+            foreach (var comp in blinkyScriptsEnabled) if (comp != null) comp.enabled = true;
+            foreach (var comp in pinkyScriptsEnabled) if (comp != null) comp.enabled = true;
+            foreach (var comp in clydeScriptsEnabled) if (comp != null) comp.enabled = true;
+            foreach (var comp in inkyScriptsEnabled) if (comp != null) comp.enabled = true;
+            foreach (var comp in pacmanScriptsEnabled) if (comp != null) comp.enabled = true;
+            
+            blinkyScriptsEnabled.Clear();
+            pinkyScriptsEnabled.Clear();
+            clydeScriptsEnabled.Clear();
+            inkyScriptsEnabled.Clear();
+            pacmanScriptsEnabled.Clear();
+
+            frozen = false;
+        }
     }
+
 
     private void SetLevel(int level)
     {

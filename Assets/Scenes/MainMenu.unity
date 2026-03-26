@@ -4633,7 +4633,7 @@ Tilemap:
       - {fileID: 2040400693, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
       - {fileID: 305617495, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
       - {fileID: 547219370, guid: ab4f879de77432d41a3133ef1d6b9dd8, type: 3}
-      m_AnimationSpeed: 60
+      m_AnimationSpeed: 60.000004
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 7, y: -2, z: 0}
@@ -5124,7 +5124,7 @@ MonoBehaviour:
   pacmanSpeed: 3
   ghostSpeed: 2
   selectedCharacter: 
-  freezeEnabled: 1
+  freezeEnabled: 0
   freezeHackUIElements: []
   cloneEnabled: 0
   cloneHackUIElements: []
