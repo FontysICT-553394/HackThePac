@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [Header("PacMan Settings")]
-    [SerializeField] private GameObject pacmanPrefab;
-    [SerializeField] private Transform pacmanSpawnPoint;
+    [SerializeField] public GameObject pacmanPrefab;
+    [SerializeField] public Transform pacmanSpawnPoint;
 
     [Header("Ghost Settings")]
     [SerializeField] private List<GameObject> ghostPrefabs;
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameWinUI;
     [SerializeField] private GameObject gameLoseUI;
 
-    private Ghost[] ghosts;
+    public Ghost[] ghosts { get; private set; }
     private PacMan pacman;
     private Transform pellets;
     private Text gameOverText;
@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
 
     // per-cell cooldown for hack toggles (seconds)
     private float hackToggleCooldown = 1f;
-    private Dictionary<Vector3Int, float> hackLastToggleTime = new Dictionary<Vector3Int, float>();
+    private Dictionary<Vector3Int, float> hackLastToggleTime = new();
     
     private void Awake()
     {
@@ -300,6 +300,7 @@ public class GameManager : MonoBehaviour
     {
         var playerCharacterName = GameSettings.instance.selectedCharacter;
         var character = GameObject.Find(playerCharacterName + "(Clone)");
+        character.tag = "Player";
         character.AddComponent<PlayerMovement>().wallLayer = LayerMask.GetMask("walls");
     }
 
@@ -567,43 +568,66 @@ public class GameManager : MonoBehaviour
             elapsed += 1f;
         }
     }
-
-    // Assets/Scripts/GameManager.cs (replace the toggle part inside CheckHackTilemapCollision)
-    private string CheckHackTilemapCollision()
+    
+   private string CheckHackTilemapCollision()
+{
+    GameObject player = pacmanInstance;
+    if (GameSettings.instance != null && GameSettings.instance.selectedCharacter != "pacman")
     {
-        if (pacmanInstance == null || hackMap == null) return null;
-
-        Vector3 worldPos = pacmanInstance.transform.position;
-        Vector3Int centerCell = hackMap.WorldToCell(worldPos);
-
-        for (int dx = -1; dx <= 1; dx++)
-        {
-            for (int dy = -1; dy <= 1; dy++)
-            {
-                Vector3Int cellPos = new Vector3Int(centerCell.x + dx, centerCell.y + dy, centerCell.z);
-                TileBase tile = hackMap.GetTile(cellPos);
-                if (tile == null) continue;
-
-                if (tile is not InfoTile infoTile) continue;
-
-                // If locked, ignore interaction.
-                if (infoTile.isHackLocked) continue;
-
-                float lastTime = 0f;
-                hackLastToggleTime.TryGetValue(cellPos, out lastTime);
-                if (Time.time - lastTime < hackToggleCooldown) continue;
-
-                // Toggle state on the tile instance, then refresh visuals for that cell.
-                infoTile.isHackEnabled = !infoTile.isHackEnabled;
-                hackMap.RefreshTile(cellPos);
-
-                hackLastToggleTime[cellPos] = Time.time;
-                return infoTile.hackName;
-            }
-        }
-
-        return null;
+        string playerName = GameSettings.instance.selectedCharacter + "(Clone)";
+        var found = GameObject.Find(playerName);
+        if (found != null)
+            player = found;
     }
+
+    if (player == null || hackMap == null) return null;
+
+    Vector3 worldPos = player.transform.position;
+    Vector3Int centerCell = hackMap.WorldToCell(worldPos);
+
+    for (int dx = -1; dx <= 1; dx++)
+    {
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            Vector3Int cellPos = new Vector3Int(centerCell.x + dx, centerCell.y + dy, centerCell.z);
+            TileBase tile = hackMap.GetTile(cellPos);
+            if (tile == null) continue;
+
+            if (tile is not InfoTile infoTile) continue;
+
+            // If locked, ignore interaction.
+            if (infoTile.isHackLocked) continue;
+
+            // Determine allowed actors.
+            bool forPac = infoTile.isHackForPacMan;
+            bool forGhost = infoTile.isHackForGhost;
+
+            // If no one is allowed, skip.
+            if (!forPac && !forGhost) continue;
+
+            bool playerIsPacman = GameSettings.instance != null && GameSettings.instance.selectedCharacter == "pacman";
+
+            // If it's only for PacMan, block ghosts.
+            if (forPac && !forGhost && !playerIsPacman) continue;
+
+            // If it's only for Ghosts, block PacMan.
+            if (forGhost && !forPac && playerIsPacman) continue;
+
+            float lastTime = 0f;
+            hackLastToggleTime.TryGetValue(cellPos, out lastTime);
+            if (Time.time - lastTime < hackToggleCooldown) continue;
+
+            // Toggle state on the tile instance, then refresh visuals for that cell.
+            infoTile.isHackEnabled = !infoTile.isHackEnabled;
+            hackMap.RefreshTile(cellPos);
+
+            hackLastToggleTime[cellPos] = Time.time;
+            return infoTile.hackName;
+        }
+    }
+
+    return null;
+}
 
     private void SwapHackState(string hackName)
     {

@@ -11,6 +11,8 @@ public class InfoTile : Tile
     public Sprite hackDisabledSprite;
     public Sprite hackEnabledSprite;
 
+    public bool isHackForPacMan = false;
+    public bool isHackForGhost = false;
     // These variables store runtime state. Since this is a ScriptableObject,
     // this state is shared by all tiles using this specific asset file.
     public bool isHackLocked = true;

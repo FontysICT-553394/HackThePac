@@ -18,7 +18,7 @@ public class PacManAI : MonoBehaviour
     
     // How strongly PacMan avoids (or chases when powered up) ghosts within danger radius.
     // Higher values = more aggressive avoidance/chasing; lower values = ghost proximity matters less.
-    [SerializeField] private float ghostPenaltyWeight = 150f; 
+    [SerializeField] private float ghostPenaltyWeight = 300f; 
     
     // How strongly PacMan is attracted toward nearby pellets.
     // Higher values = PacMan prioritizes pellets more aggressively.
@@ -34,7 +34,7 @@ public class PacManAI : MonoBehaviour
     
     // How often (in seconds) PacMan recalculates its best direction.
     // Lower values = more reactive but more CPU usage; higher values = smoother but slower reaction.
-    [SerializeField] private float decisionInterval = 0.05f;
+    [SerializeField] private float decisionInterval = 0.2f;
 
     private GameObject _blinky, _pinky, _inky, _clyde;
     private List<GameObject> _ghosts = new List<GameObject>();
