@@ -22,7 +22,6 @@ public class MainMenuManager : MonoBehaviour
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         // SceneManager.LoadScene("Game - Ryan");
         SceneManager.LoadScene("Game - Ryan2");
-
     }
     
     public void ShowCharacterSelection() 

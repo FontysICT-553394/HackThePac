@@ -19,6 +19,7 @@ public class GlitchEffect : MonoBehaviour
     private float timer = 0f;
     private Coroutine stepDownCoroutine;    
     
+    public GameObject[] ghosts;
     
     void Start()
     {
@@ -54,12 +55,25 @@ public class GlitchEffect : MonoBehaviour
         flashImage.color = new Color(1, 1, 1, 0);
     }
     
+    private IEnumerator StepDownRoutine()
+    {
+        yield return new WaitForSeconds(idleTime);
+
+        while (currentLevel > 0)
+        {
+            yield return new WaitForSeconds(stepDownDelay);
+            currentLevel--;
+            SetLevel(currentLevel);
+        }
+
+        stepDownCoroutine = null;
+    }
+
     public void TriggerStep()
     {
         if (stepDownCoroutine != null)
         {
             StopCoroutine(stepDownCoroutine);
-            stepDownCoroutine = null;
         }
 
         currentLevel++;
@@ -68,20 +82,7 @@ public class GlitchEffect : MonoBehaviour
 
         SetLevel(currentLevel);
 
-        timer = idleTime;
-    }
-
-    private IEnumerator StepDownRoutine()
-    {
-        while (currentLevel > 0)
-        {
-            yield return new WaitForSeconds(stepDownDelay);
-
-            currentLevel--;
-            SetLevel(currentLevel);
-        }
-
-        stepDownCoroutine = null;
+        stepDownCoroutine = StartCoroutine(StepDownRoutine());
     }
 
     private void SetLevel(int level)
@@ -89,7 +90,21 @@ public class GlitchEffect : MonoBehaviour
         tilemap1.SetActive(level == 1);
         tilemap2.SetActive(level == 2);
         tilemap3.SetActive(level == 3);
-        tilemap4.SetActive(level == 4); 
+        tilemap4.SetActive(level == 4);
+    
+         DisableGhostMovement(level == 4);
+    }
+
+    private void DisableGhostMovement(bool disableMovement)
+    {
+        foreach (GameObject ghost in ghosts)
+        {
+            MonoBehaviour movementScript = ghost.GetComponent<MonoBehaviour>();
+            if (movementScript != null)
+            {
+                movementScript.enabled = !disableMovement;
+            }
+        }
     }
 }
     
