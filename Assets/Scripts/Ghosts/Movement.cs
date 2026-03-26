@@ -46,6 +46,9 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (GameSettings.instance != null && GameSettings.instance.FreezeEnabled)
+            return;
+        
         Vector2 position = rb.position;
 
         float finalSpeed = speed + GameSettings.instance.ghostSpeed;

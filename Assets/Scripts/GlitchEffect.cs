@@ -19,11 +19,13 @@ public class GlitchEffect : MonoBehaviour
     private float timer = 0f;
     private Coroutine stepDownCoroutine;    
     
-    public GameObject[] ghosts;
+    private bool _isPacmanInGlitchRoom;
+    
     
     void Start()
     {
         SetLevel(0);
+        UpdateFreezeFromLevel();
     }
 
     void Update()
@@ -32,10 +34,31 @@ public class GlitchEffect : MonoBehaviour
         {
             timer -= Time.deltaTime;
 
-            if (timer <= 0f && stepDownCoroutine == null)
+            if (timer <= 0f && stepDownCoroutine == null && !IsLockedAtMaxLevel())
             {
                 stepDownCoroutine = StartCoroutine(StepDownRoutine());
             }
+        }
+    }
+
+    public void SetPacmanInGlitchRoom(bool isInRoom)
+    {
+        bool wasLockedAtMax = _isPacmanInGlitchRoom && currentLevel >= 4;
+        _isPacmanInGlitchRoom = isInRoom;
+
+        // If PacMan enters the room while already on level 4, keep it locked.
+        if (isInRoom && IsLockedAtMaxLevel() && stepDownCoroutine != null)
+        {
+            StopCoroutine(stepDownCoroutine);
+            stepDownCoroutine = null;
+        }
+
+        // When PacMan leaves the room, allow the max-level lock to step down again.
+        if (!isInRoom && wasLockedAtMax)
+        {
+            timer = 0f;
+            if (stepDownCoroutine == null)
+                stepDownCoroutine = StartCoroutine(StepDownRoutine());
         }
     }
     
@@ -55,25 +78,12 @@ public class GlitchEffect : MonoBehaviour
         flashImage.color = new Color(1, 1, 1, 0);
     }
     
-    private IEnumerator StepDownRoutine()
-    {
-        yield return new WaitForSeconds(idleTime);
-
-        while (currentLevel > 0)
-        {
-            yield return new WaitForSeconds(stepDownDelay);
-            currentLevel--;
-            SetLevel(currentLevel);
-        }
-
-        stepDownCoroutine = null;
-    }
-
     public void TriggerStep()
     {
         if (stepDownCoroutine != null)
         {
             StopCoroutine(stepDownCoroutine);
+            stepDownCoroutine = null;
         }
 
         currentLevel++;
@@ -81,8 +91,54 @@ public class GlitchEffect : MonoBehaviour
             currentLevel = 4;
 
         SetLevel(currentLevel);
+        UpdateFreezeFromLevel();
 
-        stepDownCoroutine = StartCoroutine(StepDownRoutine());
+        timer = idleTime;
+
+        // If we've reached max level inside the glitch room, keep it there.
+        if (IsLockedAtMaxLevel())
+        {
+            // Ensure no step-down is running.
+            if (stepDownCoroutine != null)
+            {
+                StopCoroutine(stepDownCoroutine);
+                stepDownCoroutine = null;
+            }
+            timer = Mathf.Infinity;
+        }
+    }
+
+    private IEnumerator StepDownRoutine()
+    {
+        while (currentLevel > 0)
+        {
+            if (IsLockedAtMaxLevel())
+                break;
+
+            yield return new WaitForSeconds(stepDownDelay);
+
+            if (IsLockedAtMaxLevel())
+                break;
+
+            currentLevel--;
+            SetLevel(currentLevel);
+            UpdateFreezeFromLevel();
+        }
+
+        stepDownCoroutine = null;
+    }
+
+    private bool IsLockedAtMaxLevel()
+    {
+        return _isPacmanInGlitchRoom && currentLevel >= 4;
+    }
+
+    private void UpdateFreezeFromLevel()
+    {
+        if (GameSettings.instance == null)
+            return;
+
+        GameSettings.instance.FreezeEnabled = currentLevel == 4;
     }
 
     private void SetLevel(int level)
@@ -90,26 +146,6 @@ public class GlitchEffect : MonoBehaviour
         tilemap1.SetActive(level == 1);
         tilemap2.SetActive(level == 2);
         tilemap3.SetActive(level == 3);
-        tilemap4.SetActive(level == 4);
-    
-         DisableGhostMovement(level == 4);
-    }
-
-    private void DisableGhostMovement(bool disableMovement)
-    {
-        foreach (GameObject ghost in ghosts)
-        {
-            MonoBehaviour movementScript = ghost.GetComponent<MonoBehaviour>();
-            if (movementScript != null)
-            {
-                movementScript.enabled = !disableMovement;
-            }
-        }
+        tilemap4.SetActive(level == 4); 
     }
 }
-    
-    
-    
-    
-
-

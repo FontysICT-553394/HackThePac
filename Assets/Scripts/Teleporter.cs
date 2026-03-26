@@ -19,6 +19,7 @@ public class Teleporter : MonoBehaviour
     [SerializeField] private GameObject CameraToWhereNot;
     private bool PlayerCanUsePortal = true;
     
+    
     private float _lastTeleportTime = -Mathf.Infinity;
     private int secretTeleportCounter = 0;
     private bool _isSecretTeleporterDisabled = false;
@@ -48,10 +49,10 @@ public class Teleporter : MonoBehaviour
         if (Time.time - _lastTeleportTime < teleportCooldown)
             return;
 
-        if (other.CompareTag("Player"))
-        {
-            FindObjectOfType<GlitchEffect>().TriggerStep();
-        }
+        // if (other.CompareTag("Player"))
+        // {
+        //     FindObjectOfType<GlitchEffect>().TriggerStep();
+        // }
 
         if (TrySecretTeleport(other.transform))
             return;
@@ -147,7 +148,7 @@ public class Teleporter : MonoBehaviour
             secretTeleportCounter = 1;
         }
         
-        //FindObjectOfType<GlitchEffect>().TriggerStep();
+        FindObjectOfType<GlitchEffect>().TriggerStep();
         
         if (secretTeleportCounter >= secretTeleportAfter)
         {
