@@ -13,13 +13,9 @@ EditorBuildSettings:
     guid: ed94c157c4b3c364ab9fe70b748830d0
   - enabled: 1
     path: Assets/Scenes/Game - Beau.unity
-    guid: 77cfe623d8f40fe7bbf86f9022d03820
+    guid: 36d63b3dc6efeb196ad24746f6b40c44
   - enabled: 1
     path: Assets/Scenes/Game - Ryan.unity
-    guid: 6ddd6e43c06c8b045a84999bfd9990f8
-  - enabled: 1
-    path: Assets/Scenes/Game - Ryan2.unity
     guid: 803aa9a693053924a9ea23c3f6c7d7b5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_UseUCBPForAssetBundles: 0
