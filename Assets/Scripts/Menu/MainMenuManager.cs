@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -15,7 +14,12 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private Slider ghostAmountSlider;
     [SerializeField] private Slider powerPelletAmountSlider;
     [SerializeField] private Toggle noClipToggle;
-    
+
+    public void Start()
+    {
+        Application.targetFrameRate = 60;
+    }
+
     public void PlayGame(string character)
     {
         GameSettings.instance.selectedCharacter = character;

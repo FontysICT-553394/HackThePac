@@ -116,6 +116,8 @@ public class GameManager : MonoBehaviour
         
         AchievementsUnlocked();
         StartTimedAchievements();
+
+        hackTilemap.GetComponent<Tilemap>().RefreshAllTiles();
     }
 
     private void Update()

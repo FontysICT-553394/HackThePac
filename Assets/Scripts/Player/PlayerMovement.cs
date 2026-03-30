@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
     private int speedHacksLeft = 3;
     private int cloneHacksLeft = 3;
     private int freezeHacksLeft = 2;
-    private int fearHacksLeft = 2;
+    private int fearHacksLeft = 1;
 
     private void Awake()
     {
